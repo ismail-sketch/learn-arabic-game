@@ -2,8 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
-  base: '/learn-arabic-game/',
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages публикует проект во вложенной папке, Vercel — от корня.
+  // VERCEL автоматически выставляет сам Vercel во время сборки.
+  base: mode === 'production' && !process.env.VERCEL ? '/learn-arabic-game/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -29,4 +31,4 @@ export default defineConfig({
       }
     })
   ]
-})
+}))
