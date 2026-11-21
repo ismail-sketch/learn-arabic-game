@@ -82,6 +82,8 @@ export interface Strings {
   listenAgain: string
   remove: string
   wordSaved: string
+  refreshApp: string
+  refreshAppHint: string
 }
 
 export const strings: Record<UiLang, Strings> = {
@@ -166,7 +168,9 @@ export const strings: Record<UiLang, Strings> = {
     wordMatch: 'Что значит это слово?',
     listenAgain: 'Послушать ещё раз',
     remove: 'Удалить',
-    wordSaved: 'Слово добавлено'
+    wordSaved: 'Слово добавлено',
+    refreshApp: 'Обновить приложение',
+    refreshAppHint: 'Очистить кэш и загрузить свежую версию'
   },
   ar: {
     appName: 'حديقة الحروف',
@@ -249,6 +253,8 @@ export const strings: Record<UiLang, Strings> = {
     wordMatch: 'ما معنى هذه الكلمة؟',
     listenAgain: 'استمع مرة أخرى',
     remove: 'حذف',
-    wordSaved: 'تمت إضافة الكلمة'
+    wordSaved: 'تمت إضافة الكلمة',
+    refreshApp: 'تحديث التطبيق',
+    refreshAppHint: 'مسح ذاكرة التخزين وتحميل أحدث إصدار'
   }
 }

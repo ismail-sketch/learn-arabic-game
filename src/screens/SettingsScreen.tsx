@@ -27,6 +27,23 @@ export function SettingsScreen() {
     setMeaning('')
   }
 
+  async function refreshApp() {
+    if (!window.confirm(`${t.refreshApp}?\n${t.refreshAppHint}`)) return
+    try {
+      if ('caches' in window) {
+        const names = await caches.keys()
+        await Promise.all(names.map((name) => caches.delete(name)))
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(registrations.map((registration) => registration.update()))
+      }
+    } finally {
+      // localStorage не очищаем: там находятся прогресс и локальная копия семьи.
+      window.location.reload()
+    }
+  }
+
   return (
     <div className="screen settings">
       <header className="lesson__head">
@@ -186,6 +203,14 @@ export function SettingsScreen() {
           </BigButton>
         </section>
       )}
+
+      <section className="card settings__refresh">
+        <h2 className="card__title">{t.refreshApp}</h2>
+        <p className="muted">{t.refreshAppHint}</p>
+        <BigButton variant="soft" full onClick={() => void refreshApp()}>
+          {t.refreshApp}
+        </BigButton>
+      </section>
 
       <p className="settings__about lat">حديقة الحروف · Сад букв · v0.2</p>
     </div>
