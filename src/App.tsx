@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useApp } from './state/AppState'
 import { setMuted } from './lib/audio'
@@ -9,14 +9,11 @@ import { ReviewScreen } from './screens/ReviewScreen'
 import { WordGameScreen } from './screens/WordGameScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { AuthScreen } from './screens/AuthScreen'
-import { authRepository, type AuthSession } from './data/auth'
+import { AdminScreen } from './screens/AdminScreen'
+import { useAuth } from './state/AuthState'
 
 function ProtectedRoutes() {
-  const [session, setSession] = useState<AuthSession | null>(null)
-
-  useEffect(() => {
-    authRepository.session().then(setSession).catch(() => setSession({ authenticated: false }))
-  }, [])
+  const { session } = useAuth()
 
   if (!session) return <div className="screen screen--center"><p className="muted">Проверяем доступ…</p></div>
   if (!session.authenticated) return <Navigate to="/auth" replace />
@@ -28,6 +25,7 @@ function ProtectedRoutes() {
     <Route path="/review" element={<ReviewScreen />} />
     <Route path="/words" element={<WordGameScreen />} />
     <Route path="/settings" element={<SettingsScreen />} />
+    <Route path="/admin" element={session.role === 'admin' ? <AdminScreen /> : <Navigate to="/" replace />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 }
