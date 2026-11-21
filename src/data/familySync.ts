@@ -1,4 +1,5 @@
 import type { AppState } from '../types'
+import { apiFetchOptions, apiUrl } from './api'
 
 interface RemoteState { state: AppState; updated_at: string }
 
@@ -8,7 +9,8 @@ export interface FamilySyncMeta {
 }
 
 async function call(body: Record<string, unknown>): Promise<Response> {
-  return fetch('/api/family-state', {
+  return fetch(apiUrl('/api/family-state'), {
+    ...apiFetchOptions,
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   })
 }

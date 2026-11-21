@@ -45,7 +45,14 @@ async function familyForToken(token: string): Promise<string | null> {
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse): Promise<void> {
-  response.setHeader('Access-Control-Allow-Origin', '*')
+  const origin = request.headers?.origin
+  const originValue = Array.isArray(origin) ? origin[0] : origin
+  const allowedOrigin = originValue === 'https://ismail-sketch.github.io' || originValue === 'http://localhost:5173'
+    ? originValue
+    : 'https://learn-arabic-game.vercel.app'
+  response.setHeader('Access-Control-Allow-Origin', allowedOrigin)
+  response.setHeader('Vary', 'Origin')
+  response.setHeader('Access-Control-Allow-Credentials', 'true')
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (request.method === 'OPTIONS') { response.status(204).json({}); return }

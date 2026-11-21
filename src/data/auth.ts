@@ -1,10 +1,12 @@
+import { apiFetchOptions, apiUrl } from './api'
+
 export type AuthRole = 'parent' | 'admin'
 
 export interface AuthSession { authenticated: boolean; role?: AuthRole; familyId?: string }
 export interface RegistrationRequest { id: string; name: string; email: string; status: 'pending' | 'approved' | 'rejected'; created_at: string }
 
 async function call(body: Record<string, string>): Promise<Response> {
-  return fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  return fetch(apiUrl('/api/auth'), { ...apiFetchOptions, method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
 }
 
 export const authRepository = {
@@ -39,7 +41,7 @@ export const authRepository = {
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not send password setup email')
   },
   async setFamilyActive(requestId: string, active: boolean): Promise<void> {
-    const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-family-active', requestId, active }) })
+    const response = await fetch(apiUrl('/api/auth'), { ...apiFetchOptions, method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-family-active', requestId, active }) })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not change family access')
   },
   async deleteFamily(requestId: string): Promise<void> {

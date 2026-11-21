@@ -80,7 +80,14 @@ async function adminUserId(request: VercelRequest): Promise<string | null> {
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse): Promise<void> {
-  response.setHeader('Access-Control-Allow-Origin', '*')
+  const origin = request.headers?.origin
+  const originValue = Array.isArray(origin) ? origin[0] : origin
+  const allowedOrigin = originValue === 'https://ismail-sketch.github.io' || originValue === 'http://localhost:5173'
+    ? originValue
+    : 'https://learn-arabic-game.vercel.app'
+  response.setHeader('Access-Control-Allow-Origin', allowedOrigin)
+  response.setHeader('Vary', 'Origin')
+  response.setHeader('Access-Control-Allow-Credentials', 'true')
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type')
   if (request.method === 'OPTIONS') { response.status(204).json({}); return }
@@ -106,7 +113,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       const session = await result.json() as { access_token: string; expires_in: number }
       const role = await roleOf(session.access_token)
       if (!role) { fail(response, 403, 'Account is waiting for approval'); return }
-      response.setHeader('Set-Cookie', `sad_auth=${session.access_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${session.expires_in}`)
+      response.setHeader('Set-Cookie', `sad_auth=${session.access_token}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${session.expires_in}`)
       response.status(200).json({ ok: true, role: role.role }); return
     }
     if (body.action === 'set-password') {
@@ -121,7 +128,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       if (!updated.ok) { fail(response, 400, 'The invitation link is invalid or expired'); return }
       const role = await roleOf(body.accessToken)
       if (!role) { fail(response, 403, 'Family access is not active'); return }
-      response.setHeader('Set-Cookie', `sad_auth=${body.accessToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600`)
+      response.setHeader('Set-Cookie', `sad_auth=${body.accessToken}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=3600`)
       response.status(200).json({ ok: true, role: role.role }); return
     }
     if (body.action === 'session') {
@@ -230,7 +237,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       response.status(200).json({ ok: true, deleted: 'user-and-family' }); return
     }
     if (body.action === 'logout') {
-      response.setHeader('Set-Cookie', 'sad_auth=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0')
+      response.setHeader('Set-Cookie', 'sad_auth=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0')
       response.status(200).json({ ok: true }); return
     }
     fail(response, 400, 'Unknown auth action')
