@@ -38,11 +38,12 @@ function PlayerLevelBar() {
   if (!profile) return null
   const trackIcons = { sprout: '🌱', flower: '🌸', tree: '🌳' } as const
   const t = strings[state.settings.uiLang]
+  const trackAges = { sprout: t.sproutAge, flower: t.flowerAge, tree: t.treeAge } as const
 
   return <div className="player-level-bar" aria-label={`${profile.name}: ${t[profile.track]}`}>
     <span className="player-level-bar__name">{profile.name}</span>
     <span className="player-level-bar__track">
-      {trackIcons[profile.track]} {t[profile.track]}
+      {trackIcons[profile.track]} {t[profile.track]} · {trackAges[profile.track]}
     </span>
   </div>
 }

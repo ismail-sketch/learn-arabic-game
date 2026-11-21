@@ -40,6 +40,9 @@ export interface Strings {
   sproutDesc: string
   flowerDesc: string
   treeDesc: string
+  sproutAge: string
+  flowerAge: string
+  treeAge: string
   audioOn: string
   audioOff: string
   sunFace: string
@@ -122,6 +125,9 @@ export const strings: Record<UiLang, Strings> = {
     sproutDesc: '3–4 года · слушаем и трогаем',
     flowerDesc: '5–6 лет · обводим и узнаём',
     treeDesc: '7–9 лет · читаем и пишем',
+    sproutAge: '3–4 года',
+    flowerAge: '5–6 лет',
+    treeAge: '7–9 лет',
     audioOn: 'Звук включён',
     audioOff: 'Звук выключен',
     sunFace: 'У Солнышка лицо',
@@ -202,6 +208,9 @@ export const strings: Record<UiLang, Strings> = {
     sproutDesc: '٣–٤ سنوات · نستمع ونلمس',
     flowerDesc: '٥–٦ سنوات · نتتبّع ونتعرّف',
     treeDesc: '٧–٩ سنوات · نقرأ ونكتب',
+    sproutAge: '٣–٤ سنوات',
+    flowerAge: '٥–٦ سنوات',
+    treeAge: '٧–٩ سنوات',
     audioOn: 'الصوت مفعّل',
     audioOff: 'الصوت مغلق',
     sunFace: 'الشمس بوجه',
