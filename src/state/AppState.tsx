@@ -5,6 +5,7 @@ import {
   useMemo,
   useReducer,
   useState,
+  useRef,
   type ReactNode
 } from 'react'
 import type { AppState, CustomWord, Progress, Profile, Settings, Track } from '../types'
@@ -153,11 +154,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [loadedFamilyId, setLoadedFamilyId] = useState<string | null>(null)
   const [remoteReady, setRemoteReady] = useState(false)
+  const saveQueue = useRef(Promise.resolve())
 
   useEffect(() => {
     if (!ready || !remoteReady || !familyId || loadedFamilyId !== familyId) return
     familyRepository(familyId).save(state)
-    void saveFamilyState(state).catch(() => undefined)
+    // Изменения прогресса могут происходить быстро. Последовательная очередь
+    // не даёт старому HTTP-запросу завершиться после нового и затереть его.
+    saveQueue.current = saveQueue.current
+      .catch(() => undefined)
+      .then(() => saveFamilyState(state))
   }, [familyId, loadedFamilyId, ready, remoteReady, state])
 
   useEffect(() => {
