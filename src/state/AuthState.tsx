@@ -3,6 +3,7 @@ import { authRepository, type AuthSession } from '../data/auth'
 
 interface AuthContextValue {
   session: AuthSession | null
+  refresh: () => Promise<AuthSession>
   logout: () => Promise<void>
 }
 
@@ -11,8 +12,14 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null)
 
+  async function refresh(): Promise<AuthSession> {
+    const next = await authRepository.session()
+    setSession(next)
+    return next
+  }
+
   useEffect(() => {
-    authRepository.session().then(setSession).catch(() => setSession({ authenticated: false }))
+    refresh().catch(() => setSession({ authenticated: false }))
   }, [])
 
   async function logout() {
@@ -20,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession({ authenticated: false })
   }
 
-  return <AuthContext.Provider value={{ session, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ session, refresh, logout }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextValue {

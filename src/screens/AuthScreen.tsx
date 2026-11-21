@@ -2,9 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authRepository } from '../data/auth'
 import { BigButton } from '../components/BigButton'
+import { useAuth } from '../state/AuthState'
 
 export function AuthScreen() {
   const navigate = useNavigate()
+  const { refresh } = useAuth()
   const [mode, setMode] = useState<'login' | 'request'>('login')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -19,7 +21,9 @@ export function AuthScreen() {
         await authRepository.requestAccess(name, email)
         setMessage('Заявка отправлена. После подтверждения администратора вы сможете войти.')
       } else {
-        await authRepository.login(email, password); navigate('/')
+        await authRepository.login(email, password)
+        await refresh()
+        navigate('/', { replace: true })
       }
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Произошла ошибка') }
     finally { setBusy(false) }
