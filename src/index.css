@@ -37,6 +37,7 @@ body {
   color: var(--ink);
   background: var(--cream);
   overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 .lat {
@@ -221,6 +222,8 @@ body {
 }
 
 .field input {
+  width: 100%;
+  min-width: 0;
   font: inherit;
   font-weight: 500;
   padding: 14px 16px;
@@ -311,6 +314,7 @@ body {
 /* ---------- Кнопки ---------- */
 
 .btn {
+  max-width: 100%;
   font: inherit;
   font-weight: 700;
   border: none;
@@ -1486,6 +1490,196 @@ body {
   color: var(--ink-mute);
   font-size: 0.8rem;
   margin-top: auto;
+}
+
+/* ---------- Адаптив для телефонов и планшетов ---------- */
+
+@media (max-width: 560px) {
+  .screen {
+    max-width: none;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    gap: 12px;
+  }
+
+  .screen--center {
+    justify-content: flex-start;
+    padding-top: max(28px, calc(28px + var(--safe-top)));
+  }
+
+  .app-title {
+    font-size: clamp(1.65rem, 8vw, 2rem);
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 20px;
+    gap: 13px;
+  }
+
+  .profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .profile-card {
+    min-width: 0;
+    padding: 14px 8px;
+  }
+
+  .profile-card__name,
+  .profile-card__track {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .profiles__admin-actions,
+  .form__actions {
+    width: 100%;
+  }
+
+  .profiles__admin-actions .btn,
+  .form__actions .btn {
+    flex: 1 1 140px;
+  }
+
+  .admin-request {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-request > div:first-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-request__actions {
+    justify-content: stretch;
+  }
+
+  .admin-request__actions .btn {
+    flex: 1 1 140px;
+  }
+
+  .mission-card,
+  .map-section {
+    border-radius: 20px;
+  }
+
+  .mission-card__topline,
+  .mission-card__body {
+    align-items: flex-start;
+  }
+
+  .mission-card__topline {
+    flex-wrap: wrap;
+  }
+
+  .mission-card__body {
+    gap: 9px;
+  }
+
+  .garden__head {
+    min-width: 0;
+  }
+
+  .garden__head > *:last-child,
+  .lesson__intro > *:last-child {
+    min-width: 0;
+  }
+
+  .track-picker {
+    gap: 6px;
+  }
+
+  .track {
+    min-width: 0;
+    padding: 10px 4px;
+  }
+
+  .track__name {
+    font-size: 0.86rem;
+  }
+
+  .track__desc {
+    font-size: 0.58rem;
+  }
+
+  .form__actions {
+    flex-wrap: wrap;
+  }
+
+  .word-stage {
+    width: min(88vw, 340px);
+    min-height: 170px;
+  }
+
+  .word-stage__glyph {
+    font-size: clamp(3.8rem, 18vw, 5rem);
+  }
+
+  .word-stage--small {
+    width: 100%;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .screen {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .btn--md {
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 0.95rem;
+  }
+
+  .btn--lg {
+    padding-left: 14px;
+    padding-right: 14px;
+    font-size: 1.05rem;
+  }
+
+  .profile-card__avatar {
+    font-size: 2rem;
+  }
+
+  .track__icon {
+    font-size: 1.35rem;
+  }
+
+  .track__desc {
+    display: none;
+  }
+
+  .mission-card {
+    padding: 14px;
+  }
+}
+
+@media (max-height: 560px) and (orientation: landscape) {
+  .screen--center {
+    justify-content: flex-start;
+    padding-top: max(12px, var(--safe-top));
+  }
+
+  .profiles__head {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .profiles__head .sun {
+    width: 64px;
+    height: 64px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
