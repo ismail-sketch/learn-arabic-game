@@ -12,7 +12,7 @@ import type { AppState, CustomWord, Progress, Profile, Settings, Track } from '.
 import { FIRST_INTERVAL, nextInterval } from '../lib/review'
 import { familyRepository } from '../data/storage'
 import { useAuth } from './AuthState'
-import { loadFamilyState, saveFamilyState } from '../data/familySync'
+import { loadFamilyState, saveFamilyState, loadSyncMeta, saveSyncMeta } from '../data/familySync'
 
 const defaultSettings: Settings = {
   uiLang: 'ru',
@@ -154,30 +154,60 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [loadedFamilyId, setLoadedFamilyId] = useState<string | null>(null)
   const [remoteReady, setRemoteReady] = useState(false)
+  const [remoteAvailable, setRemoteAvailable] = useState(false)
   const saveQueue = useRef(Promise.resolve())
 
   useEffect(() => {
     if (!ready || !remoteReady || !familyId || loadedFamilyId !== familyId) return
     familyRepository(familyId).save(state)
+    saveSyncMeta(familyId, { ...loadSyncMeta(familyId), localChangedAt: new Date().toISOString() })
+    // Без подтверждённой связи с сервером не отправляем состояние, чтобы
+    // устаревшая локальная копия не затёрла более свежие серверные данные.
+    if (!remoteAvailable) return
     // Изменения прогресса могут происходить быстро. Последовательная очередь
     // не даёт старому HTTP-запросу завершиться после нового и затереть его.
     saveQueue.current = saveQueue.current
       .catch(() => undefined)
-      .then(() => saveFamilyState(state))
-  }, [familyId, loadedFamilyId, ready, remoteReady, state])
+      .then(async () => {
+        await saveFamilyState(state)
+        saveSyncMeta(familyId, { ...loadSyncMeta(familyId), lastSyncedAt: new Date().toISOString() })
+      })
+  }, [familyId, loadedFamilyId, ready, remoteAvailable, remoteReady, state])
 
   useEffect(() => {
     let cancelled = false
     async function loadFamily() {
       setRemoteReady(false)
+      setRemoteAvailable(false)
       const local = familyId ? familyRepository(familyId).load() : null
       let next = local ? normalizeState(local) : initialState
       if (familyId) {
         try {
           const remote = await loadFamilyState()
-          if (remote) next = normalizeState(remote)
-          else if (local) await saveFamilyState(next)
-        } catch { /* Local copy remains available offline. */ }
+          const meta = loadSyncMeta(familyId)
+          if (remote) {
+            const localChanged = meta?.localChangedAt ? Date.parse(meta.localChangedAt) : NaN
+            const remoteChanged = Date.parse(remote.updatedAt)
+            const localIsNewer = local && Number.isFinite(localChanged) && localChanged > remoteChanged
+            if (localIsNewer) {
+              // Локальные изменения появились после последней синхронизации,
+              // поэтому отправляем их, а серверный снимок уже устарел.
+              next = normalizeState(local)
+              await saveFamilyState(next)
+              saveSyncMeta(familyId, { localChangedAt: new Date().toISOString(), lastSyncedAt: new Date().toISOString() })
+            } else {
+              // Серверный снимок свежее либо локальной копии нет. Он важнее:
+              // так телефон не «застревает» на старых локальных данных.
+              next = normalizeState(remote.state)
+              familyRepository(familyId).save(next)
+              saveSyncMeta(familyId, { localChangedAt: remote.updatedAt, lastSyncedAt: remote.updatedAt })
+            }
+          } else if (local) {
+            await saveFamilyState(next)
+            saveSyncMeta(familyId, { localChangedAt: new Date().toISOString(), lastSyncedAt: new Date().toISOString() })
+          }
+          if (!cancelled) setRemoteAvailable(true)
+        } catch { /* Локальная копия остаётся доступной офлайн. */ }
       }
       if (!cancelled) {
         dispatch({ type: 'LOAD_STATE', state: next })
