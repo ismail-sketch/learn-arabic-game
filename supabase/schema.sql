@@ -46,12 +46,21 @@ create table if not exists public.registration_requests (
   created_at timestamptz not null default now()
 );
 
+-- Текущее состояние приложения семьи. Доступ к нему идёт только через
+-- Vercel API, где проверяются cookie-сессия и членство в семье.
+create table if not exists public.family_app_state (
+  family_id uuid primary key references public.families(id) on delete cascade,
+  state jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
 create unique index if not exists registration_requests_pending_email_idx
   on public.registration_requests (lower(email)) where status = 'pending';
 
 alter table public.families enable row level security;
 alter table public.family_members enable row level security;
 alter table public.registration_requests enable row level security;
+alter table public.family_app_state enable row level security;
 
 alter table public.family_members add column if not exists active boolean not null default true;
 

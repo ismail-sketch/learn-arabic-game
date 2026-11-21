@@ -11,6 +11,7 @@ import type { AppState, CustomWord, Progress, Profile, Settings, Track } from '.
 import { FIRST_INTERVAL, nextInterval } from '../lib/review'
 import { familyRepository } from '../data/storage'
 import { useAuth } from './AuthState'
+import { loadFamilyState, saveFamilyState } from '../data/familySync'
 
 const defaultSettings: Settings = {
   uiLang: 'ru',
@@ -151,16 +152,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [ready, setReady] = useState(false)
   const [loadedFamilyId, setLoadedFamilyId] = useState<string | null>(null)
+  const [remoteReady, setRemoteReady] = useState(false)
 
   useEffect(() => {
-    if (ready && familyId && loadedFamilyId === familyId) familyRepository(familyId).save(state)
-  }, [familyId, loadedFamilyId, ready, state])
+    if (!ready || !remoteReady || !familyId || loadedFamilyId !== familyId) return
+    familyRepository(familyId).save(state)
+    void saveFamilyState(state).catch(() => undefined)
+  }, [familyId, loadedFamilyId, ready, remoteReady, state])
 
   useEffect(() => {
-    const next = familyId ? familyRepository(familyId).load() : null
-    dispatch({ type: 'LOAD_STATE', state: next ? normalizeState(next) : initialState })
-    setReady(Boolean(familyId))
-    setLoadedFamilyId(familyId)
+    let cancelled = false
+    async function loadFamily() {
+      setRemoteReady(false)
+      const local = familyId ? familyRepository(familyId).load() : null
+      let next = local ? normalizeState(local) : initialState
+      if (familyId) {
+        try {
+          const remote = await loadFamilyState()
+          if (remote) next = normalizeState(remote)
+          else if (local) await saveFamilyState(next)
+        } catch { /* Local copy remains available offline. */ }
+      }
+      if (!cancelled) {
+        dispatch({ type: 'LOAD_STATE', state: next })
+        setReady(Boolean(familyId))
+        setLoadedFamilyId(familyId)
+        setRemoteReady(Boolean(familyId))
+      }
+    }
+    void loadFamily()
+    return () => { cancelled = true }
   }, [familyId])
 
   const value = useMemo<Ctx>(
