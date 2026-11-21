@@ -31,6 +31,7 @@ create table if not exists public.family_members (
   family_id uuid not null references public.families(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   role text not null default 'parent' check (role in ('parent', 'admin')),
+  active boolean not null default true,
   created_at timestamptz not null default now(),
   primary key (family_id, user_id)
 );
@@ -51,6 +52,8 @@ create unique index if not exists registration_requests_pending_email_idx
 alter table public.families enable row level security;
 alter table public.family_members enable row level security;
 alter table public.registration_requests enable row level security;
+
+alter table public.family_members add column if not exists active boolean not null default true;
 
 alter table public.learning_words enable row level security;
 

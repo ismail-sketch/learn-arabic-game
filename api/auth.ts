@@ -10,7 +10,7 @@ interface VercelResponse {
   json(body: unknown): void
 }
 
-interface AuthBody { action?: string; email?: string; password?: string; name?: string; requestId?: string }
+interface AuthBody { action?: string; email?: string; password?: string; name?: string; requestId?: string; active?: boolean }
 
 function config() {
   return {
@@ -46,7 +46,7 @@ async function currentUser(token: string): Promise<{ id: string; email?: string 
 async function roleOf(token: string): Promise<{ id: string; role: string } | null> {
   const user = await currentUser(token)
   if (!user) return null
-  const result = await supabase(`/rest/v1/family_members?select=family_id,role&user_id=eq.${encodeURIComponent(user.id)}&limit=1`)
+  const result = await supabase(`/rest/v1/family_members?select=family_id,role&user_id=eq.${encodeURIComponent(user.id)}&active=eq.true&limit=1`)
   if (!result.ok) return null
   const rows = await result.json() as { family_id: string; role: string }[]
   return rows[0] ? { id: rows[0].family_id, role: rows[0].role } : null
@@ -58,6 +58,20 @@ async function requireAdmin(request: VercelRequest): Promise<{ userId: string; t
   const user = await currentUser(token)
   const role = await roleOf(token)
   return user && role?.role === 'admin' ? { userId: user.id, token } : null
+}
+
+async function requestById(id: string): Promise<{ id: string; name: string; email: string; status: string } | null> {
+  const result = await supabase(`/rest/v1/registration_requests?id=eq.${encodeURIComponent(id)}&select=id,name,email,status&limit=1`)
+  if (!result.ok) return null
+  const rows = await result.json() as { id: string; name: string; email: string; status: string }[]
+  return rows[0] ?? null
+}
+
+async function authUserByEmail(email: string): Promise<{ id: string } | null> {
+  const result = await supabase(`/auth/v1/admin/users? page=1&per_page=1000`.replace('? ', '?'), { headers: { Accept: 'application/json' } })
+  if (!result.ok) return null
+  const data = await result.json() as { users?: { id: string; email?: string }[] }
+  return data.users?.find(user => user.email?.toLowerCase() === email.toLowerCase()) ?? null
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse): Promise<void> {
@@ -104,10 +118,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     if (body.action === 'approve' || body.action === 'reject') {
       const admin = await requireAdmin(request)
       if (!admin || !body.requestId) { fail(response, 403, 'Admin access required'); return }
-      const requestResult = await supabase(`/rest/v1/registration_requests?id=eq.${encodeURIComponent(body.requestId)}&select=id,name,email,status&limit=1`)
-      if (!requestResult.ok) { fail(response, 502, 'Could not load registration request'); return }
-      const rows = await requestResult.json() as { id: string; name: string; email: string; status: string }[]
-      const item = rows[0]
+      const item = await requestById(body.requestId)
       if (!item) { fail(response, 404, 'Registration request not found'); return }
       if (item.status !== 'pending') { fail(response, 409, 'This request was already reviewed'); return }
       if (body.action === 'reject') {
@@ -137,6 +148,29 @@ export default async function handler(request: VercelRequest, response: VercelRe
       })
       if (!updated.ok) { fail(response, 502, 'Family created but request status was not updated'); return }
       response.status(200).json({ ok: true, status: 'approved' }); return
+    }
+    if (body.action === 'resend-invite') {
+      if (!await requireAdmin(request) || !body.requestId) { fail(response, 403, 'Admin access required'); return }
+      const item = await requestById(body.requestId)
+      if (!item || item.status !== 'approved') { fail(response, 409, 'Only an approved request can receive an invitation'); return }
+      const invite = await supabase('/auth/v1/admin/generate_link', {
+        method: 'POST',
+        body: JSON.stringify({ type: 'invite', email: item.email, redirect_to: process.env.APP_URL ?? 'https://learn-arabic-game.vercel.app/' })
+      })
+      if (!invite.ok) { fail(response, 502, 'Could not resend invitation email'); return }
+      response.status(200).json({ ok: true }); return
+    }
+    if (body.action === 'set-family-active') {
+      if (!await requireAdmin(request) || !body.requestId || typeof body.active !== 'boolean') { fail(response, 403, 'Admin access required'); return }
+      const item = await requestById(body.requestId)
+      if (!item || item.status !== 'approved') { fail(response, 404, 'Approved request not found'); return }
+      const user = await authUserByEmail(item.email)
+      if (!user) { fail(response, 404, 'Invited user not found'); return }
+      const result = await supabase(`/rest/v1/family_members?user_id=eq.${encodeURIComponent(user.id)}&role=eq.parent`, {
+        method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ active: body.active })
+      })
+      if (!result.ok) { fail(response, 502, 'Could not change family access'); return }
+      response.status(200).json({ ok: true, active: body.active }); return
     }
     if (body.action === 'logout') {
       response.setHeader('Set-Cookie', 'sad_auth=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0')

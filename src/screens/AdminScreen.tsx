@@ -25,6 +25,22 @@ export function AdminScreen() {
     finally { setBusyId(null) }
   }
 
+  async function resend(id: string) {
+    setBusyId(id); setError('')
+    try { await authRepository.resendInvite(id); setError('Приглашение отправлено повторно.') }
+    catch (error) { setError(error instanceof Error ? error.message : 'Не удалось отправить приглашение') }
+    finally { setBusyId(null) }
+  }
+
+  async function toggleAccess(item: RegistrationRequest) {
+    const block = window.confirm(`Изменить доступ семьи ${item.name}?`)
+    if (!block) return
+    setBusyId(item.id); setError('')
+    try { await authRepository.setFamilyActive(item.id, false); setError('Доступ семьи заблокирован.') }
+    catch (error) { setError(error instanceof Error ? error.message : 'Не удалось изменить доступ') }
+    finally { setBusyId(null) }
+  }
+
   async function signOut() {
     await logout()
     navigate('/auth', { replace: true })
@@ -50,6 +66,10 @@ export function AdminScreen() {
             {item.status === 'pending' && <div className="admin-request__actions">
               <BigButton disabled={busyId === item.id} onClick={() => review(item.id, 'approve')}>Одобрить</BigButton>
               <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => review(item.id, 'reject')}>Отклонить</BigButton>
+            </div>}
+            {item.status === 'approved' && <div className="admin-request__actions">
+              <BigButton disabled={busyId === item.id} onClick={() => resend(item.id)}>Повторить приглашение</BigButton>
+              <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => toggleAccess(item)}>Заблокировать</BigButton>
             </div>}
           </div>)}
         </div>

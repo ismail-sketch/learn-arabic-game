@@ -29,5 +29,13 @@ export const authRepository = {
   async review(requestId: string, action: 'approve' | 'reject'): Promise<void> {
     const response = await call({ action, requestId })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not review request')
+  },
+  async resendInvite(requestId: string): Promise<void> {
+    const response = await call({ action: 'resend-invite', requestId })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not resend invitation')
+  },
+  async setFamilyActive(requestId: string, active: boolean): Promise<void> {
+    const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-family-active', requestId, active }) })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not change family access')
   }
 }
