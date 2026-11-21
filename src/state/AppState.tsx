@@ -156,6 +156,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [remoteReady, setRemoteReady] = useState(false)
   const [remoteAvailable, setRemoteAvailable] = useState(false)
   const saveQueue = useRef(Promise.resolve())
+  const latestState = useRef(state)
+  const latestFamilyId = useRef(familyId)
+  latestState.current = state
+  latestFamilyId.current = familyId
+
+  function queueSync(nextState: AppState, nextFamilyId: string) {
+    saveQueue.current = saveQueue.current
+      .catch(() => undefined)
+      .then(async () => {
+        await saveFamilyState(nextState)
+        const now = new Date().toISOString()
+        saveSyncMeta(nextFamilyId, { ...loadSyncMeta(nextFamilyId), localChangedAt: now, lastSyncedAt: now })
+        setRemoteAvailable(true)
+      })
+  }
 
   useEffect(() => {
     if (!ready || !remoteReady || !familyId || loadedFamilyId !== familyId) return
@@ -166,13 +181,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!remoteAvailable) return
     // Изменения прогресса могут происходить быстро. Последовательная очередь
     // не даёт старому HTTP-запросу завершиться после нового и затереть его.
-    saveQueue.current = saveQueue.current
-      .catch(() => undefined)
-      .then(async () => {
-        await saveFamilyState(state)
-        saveSyncMeta(familyId, { ...loadSyncMeta(familyId), lastSyncedAt: new Date().toISOString() })
-      })
+    queueSync(state, familyId)
   }, [familyId, loadedFamilyId, ready, remoteAvailable, remoteReady, state])
+
+  useEffect(() => {
+    function retrySync() {
+      const currentFamilyId = latestFamilyId.current
+      if (!currentFamilyId || !ready || !remoteReady) return
+      // После офлайн-режима повторяем сохранение самой свежей локальной копии.
+      // До успешного ответа localStorage остаётся источником восстановления.
+      queueSync(latestState.current, currentFamilyId)
+    }
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible' && navigator.onLine) retrySync()
+    }
+    window.addEventListener('online', retrySync)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.removeEventListener('online', retrySync)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [ready, remoteReady])
 
   useEffect(() => {
     let cancelled = false
