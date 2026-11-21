@@ -60,7 +60,6 @@ export function GardenScreen() {
 
         <ParentGate
           label={t.parents}
-          holdLabel={t.keepHolding}
           onUnlock={() => navigate('/settings')}
         />
       </header>
