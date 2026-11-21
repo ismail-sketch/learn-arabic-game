@@ -136,7 +136,8 @@ export function ReviewScreen() {
       setResults((r) => ({ ...r, [letter.id]: true }))
       playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ' : 'Молодец!', lang })
     } else {
-      setResults((r) => ({ ...r, [letter.id]: false }))
+      // Ошибка не завершает вопрос и не двигает очередь дальше.
+      // Записываем результат только после правильного ответа.
       setWrong(opt.id)
       playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrong(null), 650)
