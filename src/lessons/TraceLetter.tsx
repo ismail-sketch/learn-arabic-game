@@ -100,7 +100,6 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
         : isTraceSuccess(result, track)
     if (ok) {
       setSuccess(true)
-      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ!' : 'Молодец!', lang })
       window.setTimeout(onComplete, 1200)
     } else {
       setFailed(true)

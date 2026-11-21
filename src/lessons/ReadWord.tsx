@@ -51,7 +51,6 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
 
   function choose(emoji: string) {
     if (emoji === letter.wordEmoji) {
-      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنت!' : 'Правильно!', lang })
       onComplete()
     } else {
       setWrong(emoji)

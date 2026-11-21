@@ -51,12 +51,13 @@ function findVoice(lang: string): SpeechSynthesisVoice | undefined {
 export function playClip(key: string, fallback?: Fallback): void {
   if (muted) return
   stopAll()
+  const run = speechRun
   const audio = new Audio(audioUrl(key))
   audio.preload = 'auto'
   current = audio
   let fallbackUsed = false
   const useFallback = () => {
-    if (fallbackUsed) return
+    if (fallbackUsed || run !== speechRun) return
     fallbackUsed = true
     current = null
     if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)

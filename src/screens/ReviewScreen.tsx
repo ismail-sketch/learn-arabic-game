@@ -50,11 +50,16 @@ export function ReviewScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  if (!profile) return <Navigate to="/" replace />
-
   const idx = Object.keys(results).length
   const letter = queue[idx]
   const finished = queue.length > 0 && !letter
+  const options = useMemo(
+    () => letter ? shuffle([letter, ...distractorsFor(letter, learned.map((l) => l.id))]) : [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [letter?.id]
+  )
+
+  if (!profile) return <Navigate to="/" replace />
 
   // Применяем результаты повторения один раз, когда очередь пройдена.
   useEffect(() => {
@@ -115,12 +120,6 @@ export function ReviewScreen() {
       </div>
     )
   }
-
-  const options = useMemo(
-    () => shuffle([letter, ...distractorsFor(letter, learned.map((l) => l.id))]),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [letter.id]
-  )
 
   const reviewItems: SpeechItem[] = [
     { text: t.reviewListen, lang, key: `instruction-review-${lang}` },

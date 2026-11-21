@@ -57,10 +57,6 @@ export function ListenTap({ letter, track, lang, onComplete }: Props) {
   ]
   useSpeak(`listen-${letter.id}-${phase}`, phase === 'learn' ? learnItems : findItems)
 
-  function praise() {
-    playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ' : 'Молодец!', lang })
-  }
-
   function playLetter() {
     setListenCount((c) => c + 1)
     playClip(`letter-${letter.id}-name`, { text: letter.ttsName, lang: 'ar' })
@@ -68,7 +64,6 @@ export function ListenTap({ letter, track, lang, onComplete }: Props) {
 
   function choose(opt: Letter) {
     if (opt.id === letter.id) {
-      praise()
       onComplete()
     } else {
       setWrongId(opt.id)
