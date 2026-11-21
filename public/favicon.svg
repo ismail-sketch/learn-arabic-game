@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#fff6e2"/>
+      <stop offset="100%" stop-color="#f3e3c2"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="42%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#ffe08a"/>
+      <stop offset="100%" stop-color="#f2b23c"/>
+    </radialGradient>
+    <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9cc47a"/>
+      <stop offset="100%" stop-color="#6f9d54"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- лучи -->
+  <g stroke="#f2b23c" stroke-width="16" stroke-linecap="round" opacity="0.85">
+    <line x1="256" y1="70" x2="256" y2="104"/>
+    <line x1="256" y1="300" x2="256" y2="334"/>
+    <line x1="96" y1="202" x2="130" y2="202"/>
+    <line x1="382" y1="202" x2="416" y2="202"/>
+    <line x1="142" y1="88" x2="166" y2="112"/>
+    <line x1="346" y1="292" x2="370" y2="316"/>
+    <line x1="370" y1="88" x2="346" y2="112"/>
+    <line x1="166" y1="292" x2="142" y2="316"/>
+  </g>
+
+  <!-- солнце (без лица) -->
+  <circle cx="256" cy="202" r="88" fill="url(#sun)"/>
+
+  <!-- холм-грядка -->
+  <path d="M96 408 C 170 352 342 352 416 408 L 416 512 L 96 512 Z" fill="url(#hill)"/>
+  <ellipse cx="256" cy="410" rx="120" ry="18" fill="#7a5a3a" opacity="0.25"/>
+
+  <!-- росток -->
+  <g stroke="#4f7a3a" stroke-width="12" stroke-linecap="round" fill="none">
+    <path d="M256 430 L 256 372"/>
+    <path d="M256 392 C 224 392 210 372 208 352 C 240 352 256 372 256 392 Z" fill="#7fb069" stroke="none"/>
+    <path d="M256 402 C 288 402 302 382 304 362 C 272 362 256 382 256 402 Z" fill="#8fc07a" stroke="none"/>
+  </g>
+</svg>
