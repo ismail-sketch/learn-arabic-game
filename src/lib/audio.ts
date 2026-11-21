@@ -10,8 +10,11 @@
  */
 
 const manifest: Record<string, string> = {
-  // 'ba-name': './audio/ba-name.mp3',
-  // 'praise-1': './audio/praise-1.mp3',
+  // Добавляйте сюда свои файлы. Имена и полный список — в public/audio/README.md.
+}
+
+function audioUrl(key: string): string {
+  return manifest[key] ?? `./audio/${key}.mp3`
 }
 
 let muted = false
@@ -43,7 +46,25 @@ function findVoice(lang: string): SpeechSynthesisVoice | undefined {
     voices.find((voice) => voice.lang.toLowerCase().startsWith(prefix))
 }
 
-function speak(text: string, lang: string, rate: number): void {
+export function playClip(key: string, fallback?: Fallback): void {
+  if (muted) return
+  stopAll()
+  const audio = new Audio(audioUrl(key))
+  audio.preload = 'auto'
+  current = audio
+  audio.onended = () => { current = null }
+  audio.onerror = () => {
+    current = null
+    if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
+  }
+  audio.play().catch(() => {
+    current = null
+    if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
+  })
+  if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
+}
+
+function speak(text: string, lang: string, rate: number, onEnd?: () => void): void {
   if (muted) return
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
   const u = new SpeechSynthesisUtterance(text)
@@ -52,6 +73,10 @@ function speak(text: string, lang: string, rate: number): void {
   u.pitch = 1
   const match = findVoice(lang)
   if (match) u.voice = match
+  if (onEnd) {
+    u.onend = onEnd
+    u.onerror = onEnd
+  }
   window.speechSynthesis.speak(u)
 }
 
@@ -66,6 +91,8 @@ export function speakRussian(text: string): void {
 export interface SpeechItem {
   text: string
   lang: 'ar' | 'ru'
+  /** Ключ записи в manifest. Если файла нет, используется временный TTS. */
+  key?: string
 }
 
 /**
@@ -81,6 +108,25 @@ export function speakSequence(items: SpeechItem[], rate = 0.95): void {
   const next = () => {
     if (run !== speechRun || i >= items.length || muted) return
     const it = items[i++]
+    const url = it.key ? audioUrl(it.key) : undefined
+    if (url) {
+      const audio = new Audio(url)
+      audio.preload = 'auto'
+      current = audio
+      audio.onended = () => {
+        current = null
+        if (run === speechRun) next()
+      }
+      audio.onerror = () => {
+        current = null
+        if (run === speechRun) speak(it.text, it.lang === 'ar' ? 'ar-SA' : 'ru-RU', rate, next)
+      }
+      audio.play().catch(() => {
+        current = null
+        if (run === speechRun) speak(it.text, it.lang === 'ar' ? 'ar-SA' : 'ru-RU', rate, next)
+      })
+      return
+    }
     const u = new SpeechSynthesisUtterance(it.text)
     u.lang = it.lang === 'ar' ? 'ar-SA' : 'ru-RU'
     u.rate = rate
@@ -97,22 +143,4 @@ export function speakSequence(items: SpeechItem[], rate = 0.95): void {
 interface Fallback {
   text: string
   lang: 'ar' | 'ru'
-}
-
-export function playClip(key: string, fallback?: Fallback): void {
-  if (muted) return
-  const url = manifest[key]
-  if (url) {
-    stopAll()
-    const audio = new Audio(url)
-    audio.preload = 'auto'
-    current = audio
-    audio.play().catch(() => {
-      if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
-    })
-    return
-  }
-  if (fallback) {
-    speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
-  }
 }

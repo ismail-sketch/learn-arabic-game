@@ -10,7 +10,7 @@ import { Plant } from '../components/Plant'
 import { ListenTap } from '../lessons/ListenTap'
 import { TraceLetter } from '../lessons/TraceLetter'
 import { ReadWord } from '../lessons/ReadWord'
-import { speakArabic, speakRussian } from '../lib/audio'
+import { playClip } from '../lib/audio'
 
 type StepId = 'listen' | 'trace' | 'read'
 
@@ -48,8 +48,10 @@ export function LessonScreen() {
   const progressPercent = Math.min(100, Math.round((Math.min(step, total) / total) * 100))
 
   function praiseSpeech() {
-    if (state.settings.uiLang === 'ar') speakArabic('أحسنتَ!')
-    else speakRussian('Молодец!')
+    playClip(`praise-correct-${state.settings.uiLang}`, {
+      text: state.settings.uiLang === 'ar' ? 'أحسنتَ!' : 'Молодец!',
+      lang: state.settings.uiLang
+    })
   }
 
   function advance() {

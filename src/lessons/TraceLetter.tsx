@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } fro
 import type { Letter } from '../data/letters'
 import type { Track, UiLang } from '../types'
 import { strings } from '../data/i18n'
-import { speakArabic, speakRussian, speakSequence, type SpeechItem } from '../lib/audio'
+import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { evaluateTrace, isTraceSuccess, samplePath, traceRules, type Pt } from '../lib/trace'
 import { BigButton } from '../components/BigButton'
@@ -34,7 +34,7 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
   const guide = useMemo(() => samplePath(letter.body, 48), [letter.body])
   const rules = traceRules(track)
 
-  const items: SpeechItem[] = [{ text: t.startTracing, lang }]
+  const items: SpeechItem[] = [{ text: t.startTracing, lang, key: `instruction-trace-${lang}` }]
   useSpeak(`trace-${letter.id}`, items)
 
   function setLive(points: Pt[]) {
@@ -100,13 +100,11 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
         : isTraceSuccess(result, track)
     if (ok) {
       setSuccess(true)
-      if (lang === 'ar') speakArabic('أحسنتَ!')
-      else speakRussian('Молодец!')
+      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ!' : 'Молодец!', lang })
       window.setTimeout(onComplete, 1200)
     } else {
       setFailed(true)
-      if (lang === 'ar') speakArabic('حاول مرّة أخرى')
-      else speakRussian('Попробуй ещё раз')
+      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
     }
   }
 

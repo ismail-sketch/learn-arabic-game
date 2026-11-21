@@ -5,7 +5,7 @@ import { letters } from '../data/letters'
 import { useApp, useActiveProfile } from '../state/AppState'
 import { strings } from '../data/i18n'
 import { dueLetters } from '../lib/review'
-import { speakArabic, speakRussian, speakSequence, type SpeechItem } from '../lib/audio'
+import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { LetterText } from '../components/LetterText'
 import { SpeakerButton } from '../components/SpeakerButton'
@@ -123,21 +123,19 @@ export function ReviewScreen() {
   )
 
   const reviewItems: SpeechItem[] = [
-    { text: t.reviewListen, lang },
-    { text: letter.ttsName, lang: 'ar' }
+    { text: t.reviewListen, lang, key: `instruction-review-${lang}` },
+    { text: letter.ttsName, lang: 'ar', key: `letter-${letter.id}-name` }
   ]
   useSpeak(`review-${letter.id}`, reviewItems)
 
   function choose(opt: Letter) {
     if (opt.id === letter.id) {
       setResults((r) => ({ ...r, [letter.id]: true }))
-      if (lang === 'ar') speakArabic('أحسنتَ')
-      else speakRussian('Молодец!')
+      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ' : 'Молодец!', lang })
     } else {
       setResults((r) => ({ ...r, [letter.id]: false }))
       setWrong(opt.id)
-      if (lang === 'ar') speakArabic('حاول مرّة أخرى')
-      else speakRussian('Попробуй ещё раз')
+      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrong(null), 650)
     }
   }

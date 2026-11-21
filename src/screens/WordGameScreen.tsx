@@ -4,7 +4,7 @@ import { letters } from '../data/letters'
 import type { CustomWord } from '../types'
 import { useApp, useActiveProfile } from '../state/AppState'
 import { strings } from '../data/i18n'
-import { speakArabic, speakRussian, speakSequence, type SpeechItem } from '../lib/audio'
+import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { SpeakerButton } from '../components/SpeakerButton'
 import { Sun } from '../components/Sun'
@@ -135,13 +135,11 @@ export function WordGameScreen() {
 
   function choose(emoji: string) {
     if (emoji === word.emoji) {
-      if (lang === 'ar') speakArabic('أحسنت!')
-      else speakRussian('Правильно!')
+      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنت!' : 'Правильно!', lang })
       setIdx((i) => i + 1)
     } else {
       setWrong(emoji)
-      if (lang === 'ar') speakArabic('حاول مرّة أخرى')
-      else speakRussian('Попробуй ещё раз')
+      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrong(null), 650)
     }
   }

@@ -3,7 +3,7 @@ import type { Letter } from '../data/letters'
 import { letters } from '../data/letters'
 import type { UiLang } from '../types'
 import { strings } from '../data/i18n'
-import { playClip, speakArabic, speakRussian, speakSequence, type SpeechItem } from '../lib/audio'
+import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { BigButton } from '../components/BigButton'
 import { SpeakerButton } from '../components/SpeakerButton'
@@ -43,21 +43,19 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
   }
 
   const readItems: SpeechItem[] = [
-    { text: t.wordListen, lang },
-    { text: letter.ttsWord, lang: 'ar' }
+    { text: t.wordListen, lang, key: `instruction-word-${lang}` },
+    { text: letter.ttsWord, lang: 'ar', key: `letter-${letter.id}-word` }
   ]
-  const quizItems: SpeechItem[] = [{ text: t.wordMatch, lang }]
+  const quizItems: SpeechItem[] = [{ text: t.wordMatch, lang, key: `instruction-match-${lang}` }]
   useSpeak(`word-${letter.id}-${phase}`, phase === 'read' ? readItems : quizItems)
 
   function choose(emoji: string) {
     if (emoji === letter.wordEmoji) {
-      if (lang === 'ar') speakArabic('أحسنت!')
-      else speakRussian('Правильно!')
+      playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنت!' : 'Правильно!', lang })
       onComplete()
     } else {
       setWrong(emoji)
-      if (lang === 'ar') speakArabic('حاول مرّة أخرى')
-      else speakRussian('Попробуй ещё раз')
+      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrong(null), 650)
     }
   }

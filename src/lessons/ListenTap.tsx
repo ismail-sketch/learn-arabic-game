@@ -3,7 +3,7 @@ import type { Letter } from '../data/letters'
 import { getDistractors } from '../data/letters'
 import type { Track, UiLang } from '../types'
 import { strings } from '../data/i18n'
-import { playClip, speakArabic, speakRussian, speakSequence, type SpeechItem } from '../lib/audio'
+import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { LetterText } from '../components/LetterText'
 import { SpeakerButton } from '../components/SpeakerButton'
@@ -48,18 +48,17 @@ export function ListenTap({ letter, track, lang, onComplete }: Props) {
   const showQuiz = distractorCount(track) > 0
 
   const learnItems: SpeechItem[] = [
-    { text: t.listenInstruction, lang },
-    { text: letter.ttsName, lang: 'ar' }
+    { text: t.listenInstruction, lang, key: `instruction-listen-${lang}` },
+    { text: letter.ttsName, lang: 'ar', key: `letter-${letter.id}-name` }
   ]
   const findItems: SpeechItem[] = [
-    { text: t.findLetter, lang },
-    { text: letter.ttsName, lang: 'ar' }
+    { text: t.findLetter, lang, key: `instruction-find-${lang}` },
+    { text: letter.ttsName, lang: 'ar', key: `letter-${letter.id}-name` }
   ]
   useSpeak(`listen-${letter.id}-${phase}`, phase === 'learn' ? learnItems : findItems)
 
   function praise() {
-    if (lang === 'ar') speakArabic('أحسنتَ')
-    else speakRussian('Молодец!')
+    playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنتَ' : 'Молодец!', lang })
   }
 
   function playLetter() {
@@ -73,8 +72,7 @@ export function ListenTap({ letter, track, lang, onComplete }: Props) {
       onComplete()
     } else {
       setWrongId(opt.id)
-      if (lang === 'ar') speakArabic('حاول مرّة أخرى')
-      else speakRussian('Попробуй ещё раз')
+      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrongId(null), 650)
     }
   }

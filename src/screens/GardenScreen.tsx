@@ -31,7 +31,10 @@ export function GardenScreen() {
     if (greetedProfiles.has(profile.id)) return
     greetedProfiles.add(profile.id)
     const hello = state.settings.uiLang === 'ar' ? 'أهلًا' : 'Привет'
-    speakSequence([{ text: `${hello}, ${profile.name}`, lang: state.settings.uiLang }])
+    speakSequence([
+      { text: hello, lang: state.settings.uiLang, key: `greeting-${state.settings.uiLang}` },
+      { text: profile.name, lang: state.settings.uiLang }
+    ])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
