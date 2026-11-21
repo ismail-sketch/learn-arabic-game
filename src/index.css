@@ -202,6 +202,38 @@ body {
   font-size: 0.82rem;
 }
 
+.player-level-bar {
+  position: fixed;
+  z-index: 20;
+  top: max(10px, var(--safe-top));
+  left: max(12px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: calc(100vw - 180px);
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 253, 247, 0.94);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  pointer-events: none;
+}
+
+.player-level-bar__name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.player-level-bar__track {
+  white-space: nowrap;
+}
+
 .session-bar button {
   pointer-events: auto;
   cursor: pointer;
@@ -1532,6 +1564,17 @@ body {
     padding-left: max(12px, env(safe-area-inset-left));
     padding-right: max(12px, env(safe-area-inset-right));
     gap: 12px;
+  }
+
+  .player-level-bar {
+    max-width: calc(100vw - 150px);
+    padding-left: 9px;
+    padding-right: 9px;
+    font-size: 0.74rem;
+  }
+
+  .player-level-bar__name {
+    max-width: 72px;
   }
 
   .screen--center {

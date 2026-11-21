@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import { useApp } from './state/AppState'
+import { useApp, useActiveProfile } from './state/AppState'
+import { strings } from './data/i18n'
 import { setMuted } from './lib/audio'
 import { ProfilesScreen } from './screens/ProfilesScreen'
 import { GardenScreen } from './screens/GardenScreen'
@@ -31,6 +32,21 @@ function SessionBar() {
   </div>
 }
 
+function PlayerLevelBar() {
+  const { state } = useApp()
+  const profile = useActiveProfile()
+  if (!profile) return null
+  const trackIcons = { sprout: '🌱', flower: '🌸', tree: '🌳' } as const
+  const t = strings[state.settings.uiLang]
+
+  return <div className="player-level-bar" aria-label={`${profile.name}: ${t[profile.track]}`}>
+    <span className="player-level-bar__name">{profile.name}</span>
+    <span className="player-level-bar__track">
+      {trackIcons[profile.track]} {t[profile.track]}
+    </span>
+  </div>
+}
+
 function ProtectedRoutes() {
   const { session } = useAuth()
 
@@ -39,6 +55,7 @@ function ProtectedRoutes() {
 
   return <>
     <SessionBar />
+    <PlayerLevelBar />
     <Routes>
     <Route path="/" element={<ProfilesScreen />} />
     <Route path="/garden" element={<GardenScreen />} />
