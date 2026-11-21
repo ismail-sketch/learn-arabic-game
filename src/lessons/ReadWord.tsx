@@ -76,6 +76,7 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
           <span className="word-stage__glyph" lang="ar" dir="rtl">
             {letter.word}
           </span>
+          <span className="word-stage__meaning">{letter.wordRu}</span>
           <span className="word-stage__emoji">{letter.wordEmoji}</span>
         </button>
 
@@ -97,11 +98,12 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
       />
       <h2 className="exercise__title">{t.whatIsIt}</h2>
 
-      <div className="word-stage word-stage--small" aria-hidden="true">
-        <span className="word-stage__glyph" lang="ar" dir="rtl">
-          {letter.word}
-        </span>
-      </div>
+        <div className="word-stage word-stage--small" aria-hidden="true">
+          <span className="word-stage__glyph" lang="ar" dir="rtl">
+            {letter.word}
+          </span>
+          <span className="word-stage__meaning">{letter.wordRu}</span>
+        </div>
 
       <div className="emoji-options">
         {options.map((emoji) => (
