@@ -63,6 +63,28 @@ export function WordGameScreen() {
   const word = queue[idx]
   const finished = !word
 
+  const options = useMemo(() => {
+    if (!word) return []
+    const pool = [
+      ...new Set(
+        shuffle(queue.filter((w) => w.id !== word.id)).map((w) => w.emoji)
+      )
+    ].slice(0, 2)
+    return shuffle([word.emoji, ...pool])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [word?.id, queue])
+
+  // Hook вызывается до любых return, в том числе на финальном экране.
+  // Иначе после последнего слова React мог оставить пустой экран из-за
+  // изменения порядка hooks.
+  const wordItems: SpeechItem[] = word
+    ? [
+        { text: t.wordListen, lang, key: `instruction-word-${lang}` },
+        { text: word.word, lang: 'ar', key: `letter-${word.id}-word` }
+      ]
+    : []
+  useSpeak(`word-${word?.id ?? 'finished'}`, wordItems)
+
   if (queue.length === 0) {
     return (
       <div className="screen lesson">
@@ -113,24 +135,8 @@ export function WordGameScreen() {
     )
   }
 
-  const options = useMemo(() => {
-    const pool = [
-      ...new Set(
-        shuffle(queue.filter((w) => w.id !== word.id)).map((w) => w.emoji)
-      )
-    ].slice(0, 2)
-    return shuffle([word.emoji, ...pool])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [word.id])
-
-  const wordItems: SpeechItem[] = [
-    { text: t.wordListen, lang },
-    { text: word.word, lang: 'ar' }
-  ]
-  useSpeak(`word-${word.id}`, wordItems)
-
   function playWord() {
-    speakSequence([{ text: word.word, lang: 'ar' }])
+    if (word) speakSequence([{ text: word.word, lang: 'ar', key: `letter-${word.id}-word` }])
   }
 
   function choose(emoji: string) {
