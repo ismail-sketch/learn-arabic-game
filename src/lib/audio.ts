@@ -20,6 +20,8 @@ function audioUrl(key: string): string {
 let muted = false
 let current: HTMLAudioElement | null = null
 let speechRun = 0
+let lastSequenceSignature = ''
+let lastSequenceAt = 0
 
 export function setMuted(value: boolean): void {
   muted = value
@@ -61,7 +63,6 @@ export function playClip(key: string, fallback?: Fallback): void {
     current = null
     if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
   })
-  if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
 }
 
 function speak(text: string, lang: string, rate: number, onEnd?: () => void): void {
@@ -102,6 +103,13 @@ export interface SpeechItem {
 export function speakSequence(items: SpeechItem[], rate = 0.95): void {
   if (muted) return
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+  const signature = items.map((item) => `${item.key ?? ''}:${item.text}:${item.lang}`).join('|')
+  const now = Date.now()
+  // React StrictMode повторно монтирует экран в dev-режиме. Не ставим одну и
+  // ту же автоматическую подсказку в очередь дважды.
+  if (signature === lastSequenceSignature && now - lastSequenceAt < 700) return
+  lastSequenceSignature = signature
+  lastSequenceAt = now
   window.speechSynthesis.cancel()
   const run = ++speechRun
   let i = 0

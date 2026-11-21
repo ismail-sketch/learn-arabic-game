@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { speakSequence, type SpeechItem } from './audio'
 
+const spokenKeys = new Set<string>()
+
 /**
  * Произносит подсказку один раз, когда меняется `key`
  * (например, при переходе к новому шагу). Переживает двойной вызов
@@ -9,8 +11,9 @@ import { speakSequence, type SpeechItem } from './audio'
 export function useSpeak(key: string, items: SpeechItem[]): void {
   const last = useRef<string>('')
   useEffect(() => {
-    if (last.current === key) return
+    if (last.current === key || spokenKeys.has(key)) return
     last.current = key
+    spokenKeys.add(key)
     if (items.length) speakSequence(items)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key])
