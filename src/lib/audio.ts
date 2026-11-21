@@ -54,15 +54,16 @@ export function playClip(key: string, fallback?: Fallback): void {
   const audio = new Audio(audioUrl(key))
   audio.preload = 'auto'
   current = audio
-  audio.onended = () => { current = null }
-  audio.onerror = () => {
+  let fallbackUsed = false
+  const useFallback = () => {
+    if (fallbackUsed) return
+    fallbackUsed = true
     current = null
     if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
   }
-  audio.play().catch(() => {
-    current = null
-    if (fallback) speak(fallback.text, fallback.lang === 'ar' ? 'ar-SA' : 'ru-RU', 0.9)
-  })
+  audio.onended = () => { current = null }
+  audio.onerror = useFallback
+  audio.play().catch(useFallback)
 }
 
 function speak(text: string, lang: string, rate: number, onEnd?: () => void): void {
@@ -121,18 +122,19 @@ export function speakSequence(items: SpeechItem[], rate = 0.95): void {
       const audio = new Audio(url)
       audio.preload = 'auto'
       current = audio
+      let fallbackUsed = false
+      const useFallback = () => {
+        if (fallbackUsed || run !== speechRun) return
+        fallbackUsed = true
+        current = null
+        speak(it.text, it.lang === 'ar' ? 'ar-SA' : 'ru-RU', rate, next)
+      }
       audio.onended = () => {
         current = null
         if (run === speechRun) next()
       }
-      audio.onerror = () => {
-        current = null
-        if (run === speechRun) speak(it.text, it.lang === 'ar' ? 'ar-SA' : 'ru-RU', rate, next)
-      }
-      audio.play().catch(() => {
-        current = null
-        if (run === speechRun) speak(it.text, it.lang === 'ar' ? 'ar-SA' : 'ru-RU', rate, next)
-      })
+      audio.onerror = useFallback
+      audio.play().catch(useFallback)
       return
     }
     const u = new SpeechSynthesisUtterance(it.text)
