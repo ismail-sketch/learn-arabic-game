@@ -177,6 +177,7 @@ export function WordGameScreen() {
           <span className="word-stage__glyph" lang="ar" dir="rtl">
             {word.word}
           </span>
+          <span className="word-stage__meaning">{word.meaning}</span>
         </button>
 
         <div className="emoji-options">

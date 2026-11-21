@@ -1227,6 +1227,12 @@ body {
   direction: rtl;
 }
 
+.word-stage__meaning {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .word-stage--small .word-stage__glyph {
   font-size: 3.4rem;
 }
