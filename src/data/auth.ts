@@ -1,6 +1,7 @@
 export type AuthRole = 'parent' | 'admin'
 
 export interface AuthSession { authenticated: boolean; role?: AuthRole; familyId?: string }
+export interface RegistrationRequest { id: string; name: string; email: string; status: 'pending' | 'approved' | 'rejected'; created_at: string }
 
 async function call(body: Record<string, string>): Promise<Response> {
   return fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -19,5 +20,14 @@ export const authRepository = {
     const response = await call({ action: 'request', name, email })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Request failed')
   },
-  async logout(): Promise<void> { await call({ action: 'logout' }) }
+  async logout(): Promise<void> { await call({ action: 'logout' }) },
+  async requests(): Promise<RegistrationRequest[]> {
+    const response = await call({ action: 'requests' })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not load requests')
+    return await response.json() as RegistrationRequest[]
+  },
+  async review(requestId: string, action: 'approve' | 'reject'): Promise<void> {
+    const response = await call({ action, requestId })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not review request')
+  }
 }
