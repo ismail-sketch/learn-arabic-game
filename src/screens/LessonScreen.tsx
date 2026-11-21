@@ -88,7 +88,7 @@ export function LessonScreen() {
           <div>
             <p className="map__eyebrow">{state.settings.uiLang === 'ar' ? 'الطريق إلى القراءة' : 'ПУТЬ К ЧТЕНИЮ'}</p>
             <h1>{activeLetter.nameAr}</h1>
-            <p>{stepLabel(current, state.settings.uiLang)} · {activeLetter.nameRu}</p>
+            <p>{stepLabel(current ?? 'listen', state.settings.uiLang)} · {activeLetter.nameRu}</p>
           </div>
           <div className="lesson__percent">{progressPercent}%</div>
         </section>
