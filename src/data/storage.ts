@@ -53,3 +53,10 @@ export interface RemoteRepository extends AppRepository {
 export const appRepository: AppRepository = new LocalStorageRepository({
   storageKey: 'sad-bukv:v2'
 })
+
+/** Локальное хранилище, изолированное идентификатором семьи. */
+export function familyRepository(familyId: string | null): AppRepository {
+  if (!familyId) return new LocalStorageRepository({ storageKey: 'sad-bukv:anonymous' })
+  const safeId = familyId.replace(/[^a-zA-Z0-9_-]/g, '_')
+  return new LocalStorageRepository({ storageKey: `sad-bukv:family:${safeId}` })
+}

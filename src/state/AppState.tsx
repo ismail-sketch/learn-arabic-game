@@ -4,11 +4,13 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useState,
   type ReactNode
 } from 'react'
 import type { AppState, CustomWord, Progress, Profile, Settings, Track } from '../types'
 import { FIRST_INTERVAL, nextInterval } from '../lib/review'
-import { appRepository } from '../data/storage'
+import { familyRepository } from '../data/storage'
+import { useAuth } from './AuthState'
 
 const defaultSettings: Settings = {
   uiLang: 'ru',
@@ -34,6 +36,7 @@ type Action =
   | { type: 'REVIEW_BATCH'; profileId: string; results: Record<string, boolean> }
   | { type: 'ADD_CUSTOM_WORD'; word: CustomWord }
   | { type: 'REMOVE_CUSTOM_WORD'; id: string }
+  | { type: 'LOAD_STATE'; state: AppState }
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -103,13 +106,14 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         customWords: state.customWords.filter((w) => w.id !== action.id)
       }
+    case 'LOAD_STATE':
+      return action.state
     default:
       return state
   }
 }
 
-function load(): AppState {
-  const parsed = appRepository.load()
+function normalizeState(parsed: AppState | null): AppState {
   if (parsed) {
     return {
       profiles: parsed.profiles ?? [],
@@ -142,11 +146,22 @@ function newId(prefix: string): string {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, load)
+  const { session } = useAuth()
+  const familyId = session?.authenticated ? session.familyId ?? null : null
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const [ready, setReady] = useState(false)
+  const [loadedFamilyId, setLoadedFamilyId] = useState<string | null>(null)
 
   useEffect(() => {
-    appRepository.save(state)
-  }, [state])
+    if (ready && familyId && loadedFamilyId === familyId) familyRepository(familyId).save(state)
+  }, [familyId, loadedFamilyId, ready, state])
+
+  useEffect(() => {
+    const next = familyId ? familyRepository(familyId).load() : null
+    dispatch({ type: 'LOAD_STATE', state: next ? normalizeState(next) : initialState })
+    setReady(Boolean(familyId))
+    setLoadedFamilyId(familyId)
+  }, [familyId])
 
   const value = useMemo<Ctx>(
     () => ({
