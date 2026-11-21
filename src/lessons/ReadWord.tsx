@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Letter } from '../data/letters'
 import { letters } from '../data/letters'
 import type { UiLang } from '../types'
@@ -29,6 +29,7 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
   const [phase, setPhase] = useState<'read' | 'quiz'>('read')
   const [wrong, setWrong] = useState<string | null>(null)
   const [round, setRound] = useState(0)
+  const completedRef = useRef(false)
 
   const options = (() => {
     const distractors = shuffle(letters.filter((l) => l.id !== letter.id))
@@ -51,6 +52,8 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
 
   function choose(emoji: string) {
     if (emoji === letter.wordEmoji) {
+      if (completedRef.current) return
+      completedRef.current = true
       onComplete()
     } else {
       setWrong(emoji)

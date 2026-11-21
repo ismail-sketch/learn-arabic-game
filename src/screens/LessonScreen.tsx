@@ -44,7 +44,8 @@ export function LessonScreen() {
   const activeLetter = letter
   const steps = stepsFor(profile.track)
   const total = steps.length
-  const current = steps[Math.min(step, total - 1)]
+  const finished = step >= total
+  const current = finished ? undefined : steps[step]
   const progressPercent = Math.min(100, Math.round((Math.min(step, total) / total) * 100))
 
   function praiseSpeech() {
@@ -63,10 +64,6 @@ export function LessonScreen() {
       setStep((s) => s + 1)
     }
   }
-
-  // Защита от пустого экрана, если быстрый повторный tap или старое состояние
-  // передали шаг за пределы маршрута.
-  const finished = step >= total || !current
 
   return (
     <div className="screen lesson lesson--mission">
