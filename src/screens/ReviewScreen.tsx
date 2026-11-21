@@ -59,6 +59,16 @@ export function ReviewScreen() {
     [letter?.id]
   )
 
+  // Hook должен вызываться на каждом рендере в одном и том же порядке.
+  // Раньше он исчезал на финальном экране очереди и React ломал отрисовку.
+  const reviewItems: SpeechItem[] = letter
+    ? [
+        { text: t.reviewListen, lang, key: `instruction-review-${lang}` },
+        { text: letter.ttsName, lang: 'ar', key: `letter-${letter.id}-name` }
+      ]
+    : []
+  useSpeak(`review-${letter?.id ?? 'finished'}`, reviewItems)
+
   if (!profile) return <Navigate to="/" replace />
 
   // Применяем результаты повторения один раз, когда очередь пройдена.
@@ -120,12 +130,6 @@ export function ReviewScreen() {
       </div>
     )
   }
-
-  const reviewItems: SpeechItem[] = [
-    { text: t.reviewListen, lang, key: `instruction-review-${lang}` },
-    { text: letter.ttsName, lang: 'ar', key: `letter-${letter.id}-name` }
-  ]
-  useSpeak(`review-${letter.id}`, reviewItems)
 
   function choose(opt: Letter) {
     if (opt.id === letter.id) {
