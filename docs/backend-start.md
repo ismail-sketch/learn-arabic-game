@@ -28,6 +28,9 @@ SUPABASE_SERVICE_ROLE_KEY=ваш-секретный-service-role-key
 
 ## Проверка
 
+После добавления переменных окружения в Vercel нужен новый deployment, чтобы
+serverless-функции получили их значения.
+
 После deployment:
 
 ```text
