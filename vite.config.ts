@@ -9,7 +9,10 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // Не перезапускаем открытое приложение при обновлении service worker.
+      // Новая версия будет активирована при следующем запуске или обычном
+      // обновлении страницы, без неожиданного повторного reload.
+      registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Сад букв',

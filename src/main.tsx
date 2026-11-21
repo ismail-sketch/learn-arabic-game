@@ -7,7 +7,7 @@ import { AppProvider } from './state/AppState'
 import { AuthProvider } from './state/AuthState'
 import './index.css'
 
-registerSW({ immediate: true })
+registerSW({ immediate: false })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
