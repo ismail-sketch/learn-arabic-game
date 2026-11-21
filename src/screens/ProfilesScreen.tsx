@@ -6,7 +6,6 @@ import { strings } from '../data/i18n'
 import type { Strings } from '../data/i18n'
 import { Sun } from '../components/Sun'
 import { BigButton } from '../components/BigButton'
-import { useAuth } from '../state/AuthState'
 
 const AVATARS = ['🌱', '🌸', '🌳', '🌷', '🌻', '🍀']
 
@@ -23,7 +22,6 @@ function descOf(id: Track, t: Strings): string {
 export function ProfilesScreen() {
   const navigate = useNavigate()
   const { state, addProfile, setActive } = useApp()
-  const { session, logout } = useAuth()
   const t = strings[state.settings.uiLang]
 
   const [adding, setAdding] = useState(false)
@@ -152,12 +150,9 @@ export function ProfilesScreen() {
       <button className="gear" type="button" aria-label={t.settings} onClick={() => navigate('/settings')}>
         ⚙
       </button>
-      {session && (
-        <div className="profiles__admin-actions">
-          {session.role === 'admin' && <BigButton variant="soft" onClick={() => navigate('/admin')}>Админ-панель</BigButton>}
-          <BigButton variant="ghost" onClick={async () => { await logout(); navigate('/auth', { replace: true }) }}>Выйти</BigButton>
-        </div>
-      )}
+      <div className="profiles__admin-actions">
+        <BigButton variant="soft" onClick={() => navigate('/settings')}>Настройки родителя</BigButton>
+      </div>
     </div>
   )
 }

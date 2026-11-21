@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useApp } from './state/AppState'
 import { setMuted } from './lib/audio'
 import { ProfilesScreen } from './screens/ProfilesScreen'
@@ -18,13 +18,28 @@ function hasPasswordSetupToken(): boolean {
   return /(?:[?#&])access_token=/.test(url)
 }
 
+function SessionBar() {
+  const navigate = useNavigate()
+  const { session, logout } = useAuth()
+
+  if (!session?.authenticated) return null
+
+  return <div className="session-bar">
+    <span>{session.role === 'admin' ? 'Администратор' : 'Родитель'}</span>
+    {session.role === 'admin' && <button type="button" onClick={() => navigate('/admin')}>Админ-панель</button>}
+    <button type="button" onClick={async () => { await logout(); navigate('/auth', { replace: true }) }}>Выйти</button>
+  </div>
+}
+
 function ProtectedRoutes() {
   const { session } = useAuth()
 
   if (!session) return <div className="screen screen--center"><p className="muted">Проверяем доступ…</p></div>
   if (!session.authenticated) return <Navigate to="/auth" replace />
 
-  return <Routes>
+  return <>
+    <SessionBar />
+    <Routes>
     <Route path="/" element={<ProfilesScreen />} />
     <Route path="/garden" element={<GardenScreen />} />
     <Route path="/lesson/:letterId" element={<LessonScreen />} />
@@ -33,7 +48,8 @@ function ProtectedRoutes() {
     <Route path="/settings" element={<SettingsScreen />} />
     <Route path="/admin" element={session.role === 'admin' ? <AdminScreen /> : <Navigate to="/" replace />} />
     <Route path="*" element={<Navigate to="/" replace />} />
-  </Routes>
+    </Routes>
+  </>
 }
 
 export default function App() {
