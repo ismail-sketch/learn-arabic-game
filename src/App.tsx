@@ -13,6 +13,11 @@ import { AdminScreen } from './screens/AdminScreen'
 import { PasswordSetupScreen } from './screens/PasswordSetupScreen'
 import { useAuth } from './state/AuthState'
 
+function hasPasswordSetupToken(): boolean {
+  const url = window.location.href
+  return /(?:[?#&])access_token=/.test(url)
+}
+
 function ProtectedRoutes() {
   const { session } = useAuth()
 
@@ -42,8 +47,7 @@ export default function App() {
     document.documentElement.lang = state.settings.uiLang
   }, [state.settings.uiLang])
 
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
-  const hasRecoveryToken = hashParams.has('access_token') && hashParams.has('type')
+  const hasRecoveryToken = hasPasswordSetupToken()
 
   return (
     <div className="app">

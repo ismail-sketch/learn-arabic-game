@@ -5,8 +5,9 @@ import { authRepository } from '../data/auth'
 import { useAuth } from '../state/AuthState'
 
 function recoveryToken(): string | null {
-  const hash = window.location.hash.replace(/^#/, '')
-  return new URLSearchParams(hash).get('access_token')
+  const url = window.location.href
+  const match = url.match(/(?:[?#&])access_token=([^&#]+)/)
+  return match ? decodeURIComponent(match[1]) : null
 }
 
 export function PasswordSetupScreen() {
@@ -27,6 +28,8 @@ export function PasswordSetupScreen() {
     try {
       await authRepository.setPassword(token, password)
       await refresh()
+      window.history.replaceState({}, document.title, window.location.pathname)
+      setMessage('Пароль сохранён. Открываем приложение…')
       navigate('/', { replace: true })
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Не удалось установить пароль') }
     finally { setBusy(false) }
