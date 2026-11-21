@@ -84,6 +84,9 @@ export function AdminScreen() {
               <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => toggleAccess(item)}>Заблокировать</BigButton>
               <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => deleteFamily(item)}>Удалить</BigButton>
             </div>}
+            {item.status === 'rejected' && <div className="admin-request__actions">
+              <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => deleteFamily(item)}>Удалить заявку</BigButton>
+            </div>}
           </div>)}
         </div>
         <BigButton variant="soft" full onClick={() => navigate('/')}>Вернуться в приложение</BigButton>
