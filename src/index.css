@@ -1233,6 +1233,59 @@ body {
   font-weight: 700;
 }
 
+.word-illustration {
+  width: 100%;
+  height: 100%;
+  min-height: 84px;
+  display: block;
+  overflow: visible;
+}
+
+.emoji-option .word-illustration {
+  width: 78%;
+  height: 78%;
+  min-height: 0;
+}
+
+.illustration__silhouette,
+.illustration__shape,
+.illustration__road,
+.illustration__book,
+.illustration__lamp,
+.illustration__cloud,
+.illustration__moon,
+.illustration__flower,
+.illustration__leaf,
+.illustration__water {
+  fill: #315c58;
+  stroke: #315c58;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.illustration__sun,
+.illustration__ray,
+.illustration__glow {
+  fill: #e9a93f;
+  stroke: #e9a93f;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.illustration__stem,
+.illustration__line,
+.illustration__bookmark,
+.illustration__rain,
+.illustration__road-line {
+  fill: none;
+  stroke: #e9a93f;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .word-stage--small .word-stage__glyph {
   font-size: 3.4rem;
 }

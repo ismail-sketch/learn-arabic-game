@@ -7,6 +7,7 @@ import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
 import { BigButton } from '../components/BigButton'
 import { SpeakerButton } from '../components/SpeakerButton'
+import { WordIllustration } from '../components/WordIllustration'
 
 interface Props {
   letter: Letter
@@ -77,7 +78,7 @@ export function ReadWord({ letter, lang, onComplete }: Props) {
             {letter.word}
           </span>
           <span className="word-stage__meaning">{letter.wordRu}</span>
-          <span className="word-stage__emoji">{letter.wordEmoji}</span>
+          <WordIllustration wordId={letter.id} label={letter.wordRu} />
         </button>
 
         <p className="exercise__hint">{t.listenWord}</p>

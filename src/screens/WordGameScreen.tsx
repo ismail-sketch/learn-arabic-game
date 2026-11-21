@@ -9,6 +9,7 @@ import { useSpeak } from '../lib/useSpeak'
 import { SpeakerButton } from '../components/SpeakerButton'
 import { Sun } from '../components/Sun'
 import { BigButton } from '../components/BigButton'
+import { WordIllustration } from '../components/WordIllustration'
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -23,7 +24,6 @@ interface Word {
   id: string
   word: string
   meaning: string
-  emoji: string
 }
 
 /**
@@ -44,13 +44,11 @@ export function WordGameScreen() {
     id: l.id,
     word: l.word,
     meaning: l.wordRu,
-    emoji: l.wordEmoji
   }))
   const custom: Word[] = state.customWords.map((w: CustomWord) => ({
     id: w.id,
     word: w.word,
     meaning: w.meaning,
-    emoji: w.emoji
   }))
 
   const queue = useMemo(() => shuffle([...builtIn, ...custom]).slice(0, 8), [
@@ -67,10 +65,10 @@ export function WordGameScreen() {
     if (!word) return []
     const pool = [
       ...new Set(
-        shuffle(queue.filter((w) => w.id !== word.id)).map((w) => w.emoji)
+        shuffle(queue.filter((w) => w.id !== word.id)).map((w) => w.id)
       )
     ].slice(0, 2)
-    return shuffle([word.emoji, ...pool])
+    return shuffle([word.id, ...pool])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [word?.id, queue])
 
@@ -139,12 +137,12 @@ export function WordGameScreen() {
     if (word) speakSequence([{ text: word.word, lang: 'ar', key: `letter-${word.id}-word` }])
   }
 
-  function choose(emoji: string) {
-    if (emoji === word.emoji) {
+  function choose(optionId: string) {
+    if (optionId === word.id) {
       playClip(`praise-correct-${lang}`, { text: lang === 'ar' ? 'أحسنت!' : 'Правильно!', lang })
       setIdx((i) => i + 1)
     } else {
-      setWrong(emoji)
+      setWrong(optionId)
       playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
       window.setTimeout(() => setWrong(null), 650)
     }
@@ -180,15 +178,15 @@ export function WordGameScreen() {
           <span className="word-stage__meaning">{word.meaning}</span>
         </button>
 
-        <div className="emoji-options">
-          {options.map((emoji, i) => (
+      <div className="emoji-options">
+        {options.map((optionId, i) => (
             <button
-              key={`${word.id}-${i}`}
+              key={`${word.id}-${optionId}-${i}`}
               type="button"
-              className={`emoji-option ${wrong === emoji ? 'emoji-option--wrong' : ''}`}
-              onClick={() => choose(emoji)}
+              className={`emoji-option ${wrong === optionId ? 'emoji-option--wrong' : ''}`}
+              onClick={() => choose(optionId)}
             >
-              {emoji}
+              <WordIllustration wordId={optionId} label={queue.find((item) => item.id === optionId)?.meaning ?? ''} />
             </button>
           ))}
         </div>
