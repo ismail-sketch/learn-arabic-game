@@ -27,7 +27,13 @@ export function AdminScreen() {
 
   async function resend(id: string) {
     setBusyId(id); setError('')
-    try { await authRepository.resendInvite(id); setError('Приглашение отправлено повторно.') }
+    try {
+      const link = await authRepository.resendInvite(id)
+      if (link) {
+        try { await navigator.clipboard.writeText(link) } catch { /* Clipboard may be unavailable in PWA */ }
+        setError('Новая ссылка создана и скопирована. Отправьте её родителю безопасным способом.')
+      } else setError('Новая ссылка создана, но Supabase не вернул её.')
+    }
     catch (error) { setError(error instanceof Error ? error.message : 'Не удалось отправить приглашение') }
     finally { setBusyId(null) }
   }

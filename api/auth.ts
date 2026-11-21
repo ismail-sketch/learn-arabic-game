@@ -153,12 +153,22 @@ export default async function handler(request: VercelRequest, response: VercelRe
       if (!await requireAdmin(request) || !body.requestId) { fail(response, 403, 'Admin access required'); return }
       const item = await requestById(body.requestId)
       if (!item || item.status !== 'approved') { fail(response, 409, 'Only an approved request can receive an invitation'); return }
+      const user = await authUserByEmail(item.email)
+      if (!user) { fail(response, 404, 'Invited user not found'); return }
       const invite = await supabase('/auth/v1/admin/generate_link', {
         method: 'POST',
-        body: JSON.stringify({ type: 'invite', email: item.email, redirect_to: process.env.APP_URL ?? 'https://learn-arabic-game.vercel.app/' })
+        body: JSON.stringify({
+          type: 'invite',
+          email: item.email,
+          redirect_to: process.env.APP_URL ?? 'https://learn-arabic-game.vercel.app/'
+        })
       })
-      if (!invite.ok) { fail(response, 502, 'Could not resend invitation email'); return }
-      response.status(200).json({ ok: true }); return
+      if (!invite.ok) {
+        const detail = (await invite.text()).slice(0, 240)
+        fail(response, 502, `Could not generate invitation link: ${detail}`); return
+      }
+      const generated = await invite.json() as { action_link?: string }
+      response.status(200).json({ ok: true, actionLink: generated.action_link ?? null }); return
     }
     if (body.action === 'set-family-active') {
       if (!await requireAdmin(request) || !body.requestId || typeof body.active !== 'boolean') { fail(response, 403, 'Admin access required'); return }
