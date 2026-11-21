@@ -10,6 +10,7 @@ import { WordGameScreen } from './screens/WordGameScreen'
 import { SettingsScreen } from './screens/SettingsScreen'
 import { AuthScreen } from './screens/AuthScreen'
 import { AdminScreen } from './screens/AdminScreen'
+import { PasswordSetupScreen } from './screens/PasswordSetupScreen'
 import { useAuth } from './state/AuthState'
 
 function ProtectedRoutes() {
@@ -41,12 +42,15 @@ export default function App() {
     document.documentElement.lang = state.settings.uiLang
   }, [state.settings.uiLang])
 
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  const hasRecoveryToken = hashParams.has('access_token') && hashParams.has('type')
+
   return (
     <div className="app">
-      <Routes>
+      {hasRecoveryToken ? <PasswordSetupScreen /> : <Routes>
         <Route path="/auth" element={<AuthScreen />} />
         <Route path="*" element={<ProtectedRoutes />} />
-      </Routes>
+      </Routes>}
     </div>
   )
 }

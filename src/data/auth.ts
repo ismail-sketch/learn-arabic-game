@@ -16,6 +16,10 @@ export const authRepository = {
     const response = await call({ action: 'login', email, password })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Login failed')
   },
+  async setPassword(accessToken: string, password: string): Promise<void> {
+    const response = await call({ action: 'set-password', accessToken, password })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not set password')
+  },
   async requestAccess(name: string, email: string): Promise<void> {
     const response = await call({ action: 'request', name, email })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Request failed')

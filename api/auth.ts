@@ -10,7 +10,7 @@ interface VercelResponse {
   json(body: unknown): void
 }
 
-interface AuthBody { action?: string; email?: string; password?: string; name?: string; requestId?: string; active?: boolean }
+interface AuthBody { action?: string; email?: string; password?: string; accessToken?: string; name?: string; requestId?: string; active?: boolean }
 
 function config() {
   return {
@@ -102,6 +102,21 @@ export default async function handler(request: VercelRequest, response: VercelRe
       const role = await roleOf(session.access_token)
       if (!role) { fail(response, 403, 'Account is waiting for approval'); return }
       response.setHeader('Set-Cookie', `sad_auth=${session.access_token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${session.expires_in}`)
+      response.status(200).json({ ok: true, role: role.role }); return
+    }
+    if (body.action === 'set-password') {
+      if (!body.accessToken || !body.password || body.password.length < 8) {
+        fail(response, 400, 'Password must contain at least 8 characters'); return
+      }
+      const updated = await supabase('/auth/v1/user', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${body.accessToken}` },
+        body: JSON.stringify({ password: body.password })
+      })
+      if (!updated.ok) { fail(response, 400, 'The invitation link is invalid or expired'); return }
+      const role = await roleOf(body.accessToken)
+      if (!role) { fail(response, 403, 'Family access is not active'); return }
+      response.setHeader('Set-Cookie', `sad_auth=${body.accessToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=3600`)
       response.status(200).json({ ok: true, role: role.role }); return
     }
     if (body.action === 'session') {
