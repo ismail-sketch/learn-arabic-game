@@ -41,5 +41,9 @@ export const authRepository = {
   async setFamilyActive(requestId: string, active: boolean): Promise<void> {
     const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-family-active', requestId, active }) })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not change family access')
+  },
+  async deleteFamily(requestId: string): Promise<void> {
+    const response = await call({ action: 'delete-family', requestId })
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not delete family')
   }
 }

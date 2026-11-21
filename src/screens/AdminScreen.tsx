@@ -44,6 +44,15 @@ export function AdminScreen() {
     finally { setBusyId(null) }
   }
 
+  async function deleteFamily(item: RegistrationRequest) {
+    if (!window.confirm(`Удалить пользователя ${item.email}?`)) return
+    if (!window.confirm('Это удалит аккаунт, семью и связанные данные. Действие необратимо. Продолжить?')) return
+    setBusyId(item.id); setError('')
+    try { await authRepository.deleteFamily(item.id); await loadRequests(); setError('Пользователь и семейный доступ удалены.') }
+    catch (error) { setError(error instanceof Error ? error.message : 'Не удалось удалить пользователя') }
+    finally { setBusyId(null) }
+  }
+
   async function signOut() {
     await logout()
     navigate('/auth', { replace: true })
@@ -73,6 +82,7 @@ export function AdminScreen() {
             {item.status === 'approved' && <div className="admin-request__actions">
               <BigButton disabled={busyId === item.id} onClick={() => resend(item.id)}>Повторить приглашение</BigButton>
               <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => toggleAccess(item)}>Заблокировать</BigButton>
+              <BigButton variant="ghost" disabled={busyId === item.id} onClick={() => deleteFamily(item)}>Удалить</BigButton>
             </div>}
           </div>)}
         </div>

@@ -74,6 +74,11 @@ async function authUserByEmail(email: string): Promise<{ id: string } | null> {
   return data.users?.find(user => user.email?.toLowerCase() === email.toLowerCase()) ?? null
 }
 
+async function adminUserId(request: VercelRequest): Promise<string | null> {
+  const admin = await requireAdmin(request)
+  return admin?.userId ?? null
+}
+
 export default async function handler(request: VercelRequest, response: VercelResponse): Promise<void> {
   response.setHeader('Access-Control-Allow-Origin', '*')
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -197,6 +202,32 @@ export default async function handler(request: VercelRequest, response: VercelRe
       })
       if (!result.ok) { fail(response, 502, 'Could not change family access'); return }
       response.status(200).json({ ok: true, active: body.active }); return
+    }
+    if (body.action === 'delete-family') {
+      const currentAdminId = await adminUserId(request)
+      if (!currentAdminId || !body.requestId) { fail(response, 403, 'Admin access required'); return }
+      const item = await requestById(body.requestId)
+      if (!item) { fail(response, 404, 'Registration request not found'); return }
+      const user = await authUserByEmail(item.email)
+      if (!user) {
+        const requestDelete = await supabase(`/rest/v1/registration_requests?id=eq.${encodeURIComponent(item.id)}`, { method: 'DELETE' })
+        if (!requestDelete.ok) { fail(response, 502, 'Could not delete registration request'); return }
+        response.status(200).json({ ok: true, deleted: 'request' }); return
+      }
+      if (user.id === currentAdminId) { fail(response, 400, 'The current administrator cannot be deleted'); return }
+      const memberResult = await supabase(`/rest/v1/family_members?user_id=eq.${encodeURIComponent(user.id)}&role=eq.parent&select=family_id`)
+      if (!memberResult.ok) { fail(response, 502, 'Could not find family membership'); return }
+      const members = await memberResult.json() as { family_id: string }[]
+      const familyIds = [...new Set(members.map(member => member.family_id))]
+      for (const familyId of familyIds) {
+        const familyDelete = await supabase(`/rest/v1/families?id=eq.${encodeURIComponent(familyId)}`, { method: 'DELETE' })
+        if (!familyDelete.ok) { fail(response, 502, 'Could not delete family data'); return }
+      }
+      const userDelete = await supabase(`/auth/v1/admin/users/${encodeURIComponent(user.id)}`, { method: 'DELETE' })
+      if (!userDelete.ok) { fail(response, 502, 'Family data was removed but user account could not be deleted'); return }
+      const requestDelete = await supabase(`/rest/v1/registration_requests?id=eq.${encodeURIComponent(item.id)}`, { method: 'DELETE' })
+      if (!requestDelete.ok) { fail(response, 502, 'User was deleted but registration request could not be deleted'); return }
+      response.status(200).json({ ok: true, deleted: 'user-and-family' }); return
     }
     if (body.action === 'logout') {
       response.setHeader('Set-Cookie', 'sad_auth=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0')
