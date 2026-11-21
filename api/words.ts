@@ -37,7 +37,9 @@ export default async function handler(request: VercelRequest, response: VercelRe
     }
 
     const baseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '')
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    // Ключи иногда вставляют из панели с переносом строки. Убираем только
+    // whitespace-артефакты копирования перед передачей в HTTP-заголовок.
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.replace(/\s/g, '')
     if (!baseUrl || !serviceKey) {
       sendError(response, 503, 'Supabase API is not configured yet')
       return
