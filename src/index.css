@@ -1561,12 +1561,15 @@ body {
 @media (max-width: 560px) {
   .screen {
     max-width: none;
+    padding-top: calc(104px + var(--safe-top));
     padding-left: max(12px, env(safe-area-inset-left));
     padding-right: max(12px, env(safe-area-inset-right));
     gap: 12px;
   }
 
   .player-level-bar {
+    top: max(8px, var(--safe-top));
+    left: max(8px, env(safe-area-inset-left));
     max-width: calc(100vw - 150px);
     padding-left: 9px;
     padding-right: 9px;
@@ -1579,7 +1582,23 @@ body {
 
   .screen--center {
     justify-content: flex-start;
-    padding-top: max(28px, calc(28px + var(--safe-top)));
+    padding-top: calc(104px + var(--safe-top));
+  }
+
+  .session-bar {
+    top: calc(52px + var(--safe-top));
+    right: max(8px, env(safe-area-inset-right));
+    left: max(8px, env(safe-area-inset-left));
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .session-bar span,
+  .session-bar button {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.76rem;
   }
 
   .app-title {
