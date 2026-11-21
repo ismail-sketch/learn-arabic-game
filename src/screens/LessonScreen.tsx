@@ -64,7 +64,9 @@ export function LessonScreen() {
     }
   }
 
-  const finished = step >= total
+  // Защита от пустого экрана, если быстрый повторный tap или старое состояние
+  // передали шаг за пределы маршрута.
+  const finished = step >= total || !current
 
   return (
     <div className="screen lesson lesson--mission">

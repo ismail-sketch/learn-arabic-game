@@ -71,7 +71,7 @@ export function GardenScreen() {
           <span className="mission-card__reward">✦ +1</span>
         </div>
         <div className="mission-card__body">
-          <div className="mission-card__seal">{missionDone ? '✓' : 'ب'}</div>
+          <div className="mission-card__seal" lang="ar" dir="rtl">{missionDone ? '✓' : nextLetter.char}</div>
           <div>
             <h2>{missionDone ? 'Миссия выполнена' : 'Открой новую букву'}</h2>
             <p>{missionDone ? 'Можно повторить букву или выбрать следующий остров.' : `Познакомься с буквой ${nextLetter.nameAr}`}</p>

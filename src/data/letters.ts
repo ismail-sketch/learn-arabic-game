@@ -67,7 +67,7 @@ export const letters: Letter[] = [
   {
     id: 'alif', char: 'ا', nameAr: 'أَلِف', nameRu: 'алиф', soundRu: 'а', ttsName: 'ألف', ttsSound: 'أَ',
     dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 0, family: 'alif',
-    word: 'أَسَد', wordRu: 'лев', wordEmoji: '◇', ttsWord: 'أسد'
+    word: 'أَسَد', wordRu: 'лев', wordEmoji: '🏜️', ttsWord: 'أسد'
   },
   {
     id: 'ba',
@@ -85,7 +85,7 @@ export const letters: Letter[] = [
     family: 'boat',
     word: 'بَاب',
     wordRu: 'дверь',
-    wordEmoji: '🚪',
+    wordEmoji: '🏠',
     ttsWord: 'باب'
   },
   {
@@ -149,7 +149,7 @@ export const letters: Letter[] = [
     family: 'wave',
     word: 'جَمَل',
     wordRu: 'верблюд',
-    wordEmoji: '🐪',
+    wordEmoji: '🌾',
     ttsWord: 'جمل'
   },
   {
@@ -168,7 +168,7 @@ export const letters: Letter[] = [
     family: 'wave',
     word: 'حُصَان',
     wordRu: 'лошадь',
-    wordEmoji: '🐴',
+    wordEmoji: '🌾',
     ttsWord: 'حصان'
   },
   {
@@ -187,7 +187,7 @@ export const letters: Letter[] = [
     family: 'wave',
     word: 'خُبْز',
     wordRu: 'хлеб',
-    wordEmoji: '🍞',
+    wordEmoji: '▰',
     ttsWord: 'خبز'
   },
   {
@@ -206,7 +206,7 @@ export const letters: Letter[] = [
     family: 'daal',
     word: 'دُبّ',
     wordRu: 'медведь',
-    wordEmoji: '🐻',
+    wordEmoji: '▰',
     ttsWord: 'دب'
   },
   {
@@ -244,7 +244,7 @@ export const letters: Letter[] = [
     family: 'raa',
     word: 'رُمَّان',
     wordRu: 'гранат',
-    wordEmoji: '🍎',
+    wordEmoji: '🔴',
     ttsWord: 'رمان'
   },
   {
@@ -263,64 +263,64 @@ export const letters: Letter[] = [
     family: 'raa',
     word: 'زَهْرَة',
     wordRu: 'цветок',
-    wordEmoji: '🌸',
+    wordEmoji: '✿',
     ttsWord: 'زهرة'
   },
   {
     id: 'seen', char: 'س', nameAr: 'سِين', nameRu: 'син', soundRu: 'са', ttsName: 'سين', ttsSound: 'سَ',
     dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 11, family: 'seen',
-    word: 'سَمَك', wordRu: 'рыба', wordEmoji: '≋', ttsWord: 'سمك'
+    word: 'سَمَك', wordRu: 'рыба', wordEmoji: '🌊', ttsWord: 'سمك'
   },
   {
     id: 'sheen', char: 'ش', nameAr: 'شِين', nameRu: 'шин', soundRu: 'ша', ttsName: 'شين', ttsSound: 'شَ',
     dotCount: 3, dotSide: 'above', body: BODY_WAVE,
     dots: [{ cx: 128, cy: 78, r: 10 }, { cx: 160, cy: 62, r: 10 }, { cx: 192, cy: 78, r: 10 }], order: 12, family: 'seen',
-    word: 'شَمْس', wordRu: 'солнце', wordEmoji: '☼', ttsWord: 'شمس'
+    word: 'شَمْس', wordRu: 'солнце', wordEmoji: '☀️', ttsWord: 'شمس'
   },
   {
     id: 'saad', char: 'ص', nameAr: 'صَاد', nameRu: 'сад', soundRu: 'са', ttsName: 'صاد', ttsSound: 'صَ',
     dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 13, family: 'saad',
-    word: 'صَبْر', wordRu: 'терпение', wordEmoji: '◇', ttsWord: 'صبر'
+    word: 'صَبْر', wordRu: 'терпение', wordEmoji: '🌿', ttsWord: 'صبر'
   },
   {
     id: 'daad', char: 'ض', nameAr: 'ضَاد', nameRu: 'дад', soundRu: 'да', ttsName: 'ضاد', ttsSound: 'ضَ',
     dotCount: 1, dotSide: 'above', body: BODY_WAVE, dots: [{ cx: 156, cy: 74, r: 12 }], order: 14, family: 'saad',
-    word: 'ضَوْء', wordRu: 'свет', wordEmoji: '✦', ttsWord: 'ضوء'
+    word: 'ضَوْء', wordRu: 'свет', wordEmoji: '💡', ttsWord: 'ضوء'
   },
   {
     id: 'taa', char: 'ط', nameAr: 'طَاء', nameRu: 'та', soundRu: 'та', ttsName: 'طاء', ttsSound: 'طَ',
     dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 15, family: 'taa',
-    word: 'طَرِيق', wordRu: 'дорога', wordEmoji: '→', ttsWord: 'طريق'
+    word: 'طَرِيق', wordRu: 'дорога', wordEmoji: '🛤️', ttsWord: 'طريق'
   },
   {
     id: 'thaa', char: 'ظ', nameAr: 'ظَاء', nameRu: 'за', soundRu: 'за', ttsName: 'ظاء', ttsSound: 'ظَ',
     dotCount: 1, dotSide: 'above', body: BODY_DAAL, dots: [{ cx: 150, cy: 58, r: 12 }], order: 16, family: 'taa',
-    word: 'ظِلّ', wordRu: 'тень', wordEmoji: '◐', ttsWord: 'ظل'
+    word: 'ظِلّ', wordRu: 'тень', wordEmoji: '⛱️', ttsWord: 'ظل'
   },
   {
     id: 'ain', char: 'ع', nameAr: 'عَيْن', nameRu: 'айн', soundRu: 'а', ttsName: 'عين', ttsSound: 'عَ',
     dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 17, family: 'ain',
-    word: 'عِلْم', wordRu: 'знание', wordEmoji: '✧', ttsWord: 'علم'
+    word: 'عِلْم', wordRu: 'знание', wordEmoji: '📚', ttsWord: 'علم'
   },
   {
     id: 'ghain', char: 'غ', nameAr: 'غَيْن', nameRu: 'гайн', soundRu: 'га', ttsName: 'غين', ttsSound: 'غَ',
     dotCount: 1, dotSide: 'above', body: BODY_WAVE, dots: [{ cx: 152, cy: 82, r: 12 }], order: 18, family: 'ain',
-    word: 'غَيْم', wordRu: 'облако', wordEmoji: '☁', ttsWord: 'غيم'
+    word: 'غَيْم', wordRu: 'облако', wordEmoji: '☁️', ttsWord: 'غيم'
   },
   {
     id: 'faa', char: 'ف', nameAr: 'فَاء', nameRu: 'фа', soundRu: 'фа', ttsName: 'فاء', ttsSound: 'فَ',
     dotCount: 1, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 160, cy: 94, r: 12 }], order: 19, family: 'faa',
-    word: 'فَم', wordRu: 'рот', wordEmoji: '□', ttsWord: 'فم'
+    word: 'فَم', wordRu: 'рот', wordEmoji: '🔷', ttsWord: 'فم'
   },
   {
     id: 'qaaf', char: 'ق', nameAr: 'قَاف', nameRu: 'каф', soundRu: 'ка', ttsName: 'قاف', ttsSound: 'قَ',
     dotCount: 2, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 142, cy: 88, r: 11 }, { cx: 178, cy: 88, r: 11 }], order: 20, family: 'faa',
-    word: 'قَلَم', wordRu: 'ручка', wordEmoji: '✎', ttsWord: 'قلم'
+    word: 'قَلَم', wordRu: 'ручка', wordEmoji: '🖊️', ttsWord: 'قلم'
   },
   {
     id: 'kaaf', char: 'ك', nameAr: 'كَاف', nameRu: 'каф', soundRu: 'ка', ttsName: 'كاف', ttsSound: 'كَ',
     dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 21, family: 'kaaf',
-    word: 'كِتَاب', wordRu: 'книга', wordEmoji: '▤', ttsWord: 'كتاب'
+    word: 'كِتَاب', wordRu: 'книга', wordEmoji: '📖', ttsWord: 'كتاب'
   },
   {
     id: 'laam', char: 'ل', nameAr: 'لَام', nameRu: 'лям', soundRu: 'ля', ttsName: 'لام', ttsSound: 'لَ',
@@ -330,12 +330,12 @@ export const letters: Letter[] = [
   {
     id: 'meem', char: 'م', nameAr: 'مِيم', nameRu: 'мим', soundRu: 'ма', ttsName: 'ميم', ttsSound: 'مَ',
     dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 23, family: 'meem',
-    word: 'مَاء', wordRu: 'вода', wordEmoji: '≈', ttsWord: 'ماء'
+    word: 'مَاء', wordRu: 'вода', wordEmoji: '💧', ttsWord: 'ماء'
   },
   {
     id: 'noon', char: 'ن', nameAr: 'نُون', nameRu: 'нун', soundRu: 'на', ttsName: 'نون', ttsSound: 'نَ',
     dotCount: 1, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 160, cy: 94, r: 12 }], order: 24, family: 'noon',
-    word: 'نُور', wordRu: 'свет', wordEmoji: '✦', ttsWord: 'نور'
+    word: 'نُور', wordRu: 'свет', wordEmoji: '🔆', ttsWord: 'نور'
   },
   {
     id: 'haa2', char: 'ه', nameAr: 'هَاء', nameRu: 'ха', soundRu: 'ха', ttsName: 'هاء', ttsSound: 'هَ',
@@ -345,12 +345,12 @@ export const letters: Letter[] = [
   {
     id: 'waw', char: 'و', nameAr: 'وَاو', nameRu: 'вау', soundRu: 'ва', ttsName: 'واو', ttsSound: 'وَ',
     dotCount: 0, dotSide: 'above', body: BODY_RAA, dots: [], order: 26, family: 'waw',
-    word: 'وَرَق', wordRu: 'лист', wordEmoji: '❧', ttsWord: 'ورق'
+    word: 'وَرَق', wordRu: 'лист', wordEmoji: '🍃', ttsWord: 'ورق'
   },
   {
     id: 'yaa', char: 'ي', nameAr: 'يَاء', nameRu: 'йа', soundRu: 'йа', ttsName: 'ياء', ttsSound: 'يَ',
     dotCount: 2, dotSide: 'below', body: BODY_BOAT, dots: [{ cx: 142, cy: 278, r: 11 }, { cx: 178, cy: 278, r: 11 }], order: 27, family: 'yaa',
-    word: 'يَد', wordRu: 'рука', wordEmoji: '□', ttsWord: 'يد'
+    word: 'يَد', wordRu: 'рука', wordEmoji: '✋', ttsWord: 'يد'
   }
 ]
 
