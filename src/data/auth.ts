@@ -30,10 +30,9 @@ export const authRepository = {
     const response = await call({ action, requestId })
     if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not review request')
   },
-  async resendInvite(requestId: string): Promise<string | null> {
+  async resendInvite(requestId: string): Promise<void> {
     const response = await call({ action: 'resend-invite', requestId })
-    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not resend invitation')
-    return (await response.json() as { actionLink?: string | null }).actionLink ?? null
+    if (!response.ok) throw new Error((await response.json() as { error?: string }).error ?? 'Could not send password setup email')
   },
   async setFamilyActive(requestId: string, active: boolean): Promise<void> {
     const response = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'set-family-active', requestId, active }) })
