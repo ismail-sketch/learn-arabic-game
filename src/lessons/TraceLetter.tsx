@@ -31,6 +31,8 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
   const [strokes, setStrokesState] = useState<Pt[][]>([])
   const [success, setSuccess] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [partial, setPartial] = useState(false)
+  const [remaining, setRemaining] = useState<Pt[]>([])
 
   const outline = letterShapes[letter.id]?.outline ?? ''
   const mask = useMemo(() => buildLetterMask(outline), [outline])
@@ -95,14 +97,20 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
     setLive([])
 
     const result = evaluateTrace(mask, next, rules.tol)
-    // Малышам (Росточек) достаточно просто поводить пальцем — не оцениваем.
-    const ok = track === 'sprout' ? next.flat().length >= 4 : isTraceSuccess(result, track)
-    if (ok) {
+    // Любая дорожка: упражнение завершается только после полной обводки буквы.
+    if (isTraceSuccess(result, track)) {
       setSuccess(true)
+      setRemaining([])
       window.setTimeout(onComplete, 1200)
     } else {
       setFailed(true)
-      playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
+      setPartial(result.coverage > 0)
+      setRemaining(result.remaining)
+      // Пока ребёнок продвигается по букве, не ругаем его звуком: частичные
+      // штрихи (тело, затем точки) — нормальная часть обводки.
+      if (result.coverage < 0.3) {
+        playClip(`praise-again-${lang}`, { text: lang === 'ar' ? 'حاول مرّة أخرى' : 'Попробуй ещё раз', lang })
+      }
     }
   }
 
@@ -110,6 +118,8 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
     setStrokes([])
     setLive([])
     setFailed(false)
+    setPartial(false)
+    setRemaining([])
     setSuccess(false)
   }
 
@@ -147,7 +157,14 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
               strokeLinejoin="round"
             />
           )}
-          {!strokes.length && !live.length && mask.start && (
+          {remaining.length > 0 && !success && (
+            <g className="trace-remain">
+              {remaining.map((point, i) => (
+                <circle key={i} cx={point.x} cy={point.y} r="3.2" />
+              ))}
+            </g>
+          )}
+          {!strokes.length && !live.length && !remaining.length && mask.start && (
             <circle
               className="trace-start"
               cx={mask.start.x}
@@ -187,8 +204,12 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
       </div>
 
       <div className="trace-footer">
-        <span className={`trace-status ${failed ? 'trace-status--failed' : ''}`}>
-          {failed ? t.tryAgain : `${letter.nameAr} · ${letter.nameRu}`}
+        <span
+          className={`trace-status ${failed && !partial ? 'trace-status--failed' : ''} ${
+            failed && partial ? 'trace-status--hint' : ''
+          }`}
+        >
+          {failed ? (partial ? t.traceAlmost : t.tryAgain) : `${letter.nameAr} · ${letter.nameRu}`}
         </span>
         <BigButton variant="soft" onClick={clear} type="button">
           {t.clear}

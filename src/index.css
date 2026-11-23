@@ -1074,6 +1074,25 @@ body {
   animation: pulse 1.4s ease-in-out infinite;
 }
 
+/* Куда ещё не дошёл палец: остатки буквы после неполной обводки */
+.trace-remain {
+  animation: remainBlink 1.2s ease-in-out infinite;
+}
+
+.trace-remain circle {
+  fill: #d98b8b;
+}
+
+@keyframes remainBlink {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {
@@ -1134,6 +1153,10 @@ body {
 
 .trace-status--failed {
   color: #c86a6a;
+}
+
+.trace-status--hint {
+  color: var(--leaf-deep);
 }
 
 /* ---------- Урок завершён ---------- */

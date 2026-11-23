@@ -26,6 +26,7 @@ export interface Strings {
   traceTitle: string
   wellDone: string
   tryAgain: string
+  traceAlmost: string
   greatJob: string
   next: string
   done: string
@@ -113,6 +114,7 @@ export const strings: Record<UiLang, Strings> = {
     traceTitle: 'Обведи букву',
     wellDone: 'Молодец!',
     tryAgain: 'Попробуй ещё раз',
+    traceAlmost: 'Обведи всю букву — вот что осталось',
     greatJob: 'Отлично! Ты вырастил цветок!',
     next: 'Дальше',
     done: 'Готово',
@@ -198,6 +200,7 @@ export const strings: Record<UiLang, Strings> = {
     traceTitle: 'تتبّع الحرف',
     wellDone: 'أحسنتَ!',
     tryAgain: 'حاول مرّة أخرى',
+    traceAlmost: 'تتبّع الحرف كاملًا — هذا ما بقي',
     greatJob: 'رائع! لقد أنبتتَ زهرة!',
     next: 'التالي',
     done: 'تمّ',

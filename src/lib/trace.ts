@@ -4,10 +4,13 @@
  * Буква рисуется по точному контуру (`letterShapes[id].outline`) в системе
  * viewBox 0 0 320 320. Из этого же контура строится маска: точки-ориентиры
  * внутри буквы и подсказка «начни здесь». Ребёнок ведёт палец по букве —
- * успех засчитывается, когда он обвёл почти всю букву и при этом не размазал
- * палец по всей доске.
+ * успех засчитывается только когда обведена ВСЯ буква (все точки-ориентиры,
+ * включая точки над буквами) и при этом палец не размазан по всей доске.
+ * Частично обведённая буква не завершает упражнение: оставшиеся участки
+ * показываются ребёнку точками.
  *
- * Оценка нарочно мягкая: важно «провести по букве», а не идеальная каллиграфия.
+ * Мягким осталось только попадание в саму букву (допуск и доля следа на букве),
+ * полнота обводки не смягчается ни на одной возрастной дорожке.
  */
 
 import type { Track } from '../types'
@@ -107,6 +110,8 @@ export interface TraceResult {
   onLetter: number
   /** Длина нарисованного пути в единицах viewBox */
   length: number
+  /** Ориентиры, которые ребёнок ещё не обвёл — для подсказки на доске */
+  remaining: Pt[]
 }
 
 function dist(a: Pt, b: Pt): number {
@@ -121,22 +126,27 @@ export function evaluateTrace(
   const guide = mask.guide
   const user = strokes.flat()
   if (user.length < 2 || guide.length === 0) {
-    return { coverage: 0, onLetter: 0, length: 0 }
+    return { coverage: 0, onLetter: 0, length: 0, remaining: guide.slice() }
   }
 
   const tol2 = tol * tol
 
-  // насколько обведена сама буква
+  // насколько обведена сама буква; непройденные ориентиры пригодятся
+  // для подсказки, что ещё осталось обвести
   let covered = 0
+  const remaining: Pt[] = []
   for (const g of guide) {
+    let hit = false
     for (const u of user) {
       const dx = g.x - u.x
       const dy = g.y - u.y
       if (dx * dx + dy * dy <= tol2) {
-        covered++
+        hit = true
         break
       }
     }
+    if (hit) covered++
+    else remaining.push(g)
   }
   const coverage = covered / guide.length
 
@@ -159,13 +169,17 @@ export function evaluateTrace(
     for (let i = 1; i < stroke.length; i++) length += dist(stroke[i], stroke[i - 1])
   }
 
-  return { coverage, onLetter, length }
+  return { coverage, onLetter, length, remaining }
 }
 
 /**
- * Порог успеха, допуск и минимальная длина зависят от возрастной дорожки.
+ * Правила успеха зависят от возрастной дорожки.
  *
- * `onLetter` — доля следa, который прошёл по букве. Она не даёт «нарисовать
+ * `coverage` — всегда 1: буква считается обведённой, только когда пройдены
+ * все её ориентиры (тело буквы и точки над ней). Дорожка меняет лишь допуск
+ * и аккуратность: малышам прощают более широкий след, старшим — более узкий.
+ *
+ * `onLetter` — доля следа, который прошёл по букве. Она не даёт «нарисовать
  * зигзаг по всей доске»: при обводке другой буквы эта доля ~0.96–1.0,
  * а при случайном зигзаге — около 0.2–0.6.
  */
@@ -176,12 +190,11 @@ export function traceRules(track: Track): {
 } {
   switch (track) {
     case 'sprout':
-      // Малыши не оцениваются: в TraceLetter достаточно провести пальцем.
-      return { coverage: 0.45, tol: 38, onLetter: 0.55 }
+      return { coverage: 1, tol: 40, onLetter: 0.55 }
     case 'flower':
-      return { coverage: 0.6, tol: 30, onLetter: 0.7 }
+      return { coverage: 1, tol: 32, onLetter: 0.7 }
     case 'tree':
-      return { coverage: 0.72, tol: 24, onLetter: 0.78 }
+      return { coverage: 1, tol: 28, onLetter: 0.78 }
   }
 }
 
