@@ -4,7 +4,7 @@ import { letters } from '../data/letters'
 import { useApp, useActiveProfile } from '../state/AppState'
 import { strings } from '../data/i18n'
 import { dueLetters } from '../lib/review'
-import { speakSequence } from '../lib/audio'
+import { hasRecording, speakSequence, type SpeechItem } from '../lib/audio'
 import { Sun } from '../components/Sun'
 import { BedScene } from '../components/BedScene'
 import { ParentGate } from '../components/ParentGate'
@@ -31,10 +31,14 @@ export function GardenScreen() {
     if (greetedProfiles.has(profile.id)) return
     greetedProfiles.add(profile.id)
     const hello = state.settings.uiLang === 'ar' ? 'أهلًا' : 'Привет'
-    speakSequence([
-      { text: hello, lang: state.settings.uiLang, key: `greeting-${state.settings.uiLang}` },
-      { text: profile.name, lang: state.settings.uiLang }
-    ])
+    const greetingKey = `greeting-${state.settings.uiLang}`
+    const items: SpeechItem[] = [{ text: hello, lang: state.settings.uiLang, key: greetingKey }]
+    // Если приветствие уже записано, воспроизводим только запись:
+    // робот не добавляет своё произношение имени поверх неё.
+    if (!hasRecording(greetingKey)) {
+      items.push({ text: profile.name, lang: state.settings.uiLang })
+    }
+    speakSequence(items)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

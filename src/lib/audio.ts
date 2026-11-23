@@ -11,6 +11,12 @@
 
 const manifest: Record<string, string> = {
   // Добавляйте сюда свои файлы. Имена и полный список — в public/audio/README.md.
+  'greeting-ru': './audio/greeting-ru.mp3'
+}
+
+/** Есть ли для ключа готовая запись (а не временный TTS). */
+export function hasRecording(key: string): boolean {
+  return Boolean(manifest[key])
 }
 
 function audioUrl(key: string): string {
