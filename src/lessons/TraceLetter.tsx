@@ -1,10 +1,11 @@
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Letter } from '../data/letters'
+import { letterShapes } from '../data/letterShapes'
 import type { Track, UiLang } from '../types'
 import { strings } from '../data/i18n'
 import { playClip, speakSequence, type SpeechItem } from '../lib/audio'
 import { useSpeak } from '../lib/useSpeak'
-import { evaluateTrace, isTraceSuccess, samplePath, traceRules, type Pt } from '../lib/trace'
+import { buildLetterMask, evaluateTrace, isTraceSuccess, traceRules, type Pt } from '../lib/trace'
 import { BigButton } from '../components/BigButton'
 import { SpeakerButton } from '../components/SpeakerButton'
 import { Plant } from '../components/Plant'
@@ -31,7 +32,8 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
   const [success, setSuccess] = useState(false)
   const [failed, setFailed] = useState(false)
 
-  const guide = useMemo(() => samplePath(letter.body, 48), [letter.body])
+  const outline = letterShapes[letter.id]?.outline ?? ''
+  const mask = useMemo(() => buildLetterMask(outline), [outline])
   const rules = traceRules(track)
 
   const items: SpeechItem[] = [{ text: t.startTracing, lang, key: `instruction-trace-${lang}` }]
@@ -92,12 +94,9 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
     setStrokes(next)
     setLive([])
 
-    const result = evaluateTrace(guide, next, rules.tol)
+    const result = evaluateTrace(mask, next, rules.tol)
     // Малышам (Росточек) достаточно просто поводить пальцем — не оцениваем.
-    const ok =
-      track === 'sprout'
-        ? next.flat().length >= 4
-        : isTraceSuccess(result, track)
+    const ok = track === 'sprout' ? next.flat().length >= 4 : isTraceSuccess(result, track)
     if (ok) {
       setSuccess(true)
       window.setTimeout(onComplete, 1200)
@@ -137,30 +136,22 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
             if (drawing.current) move(e)
           }}
         >
-          <path
-            d={letter.body}
-            fill="none"
-            stroke="#dfcdb0"
-            strokeWidth="34"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d={letter.body}
-            fill="none"
-            stroke="#ae9473"
-            strokeWidth="5"
-            strokeDasharray="2 12"
-            strokeLinecap="round"
-          />
-          {letter.dots.map((dot, i) => (
-            <circle key={i} cx={dot.cx} cy={dot.cy} r={dot.r + 2} fill="#dfcdb0" />
-          ))}
-          {!strokes.length && !live.length && guide.length > 0 && (
+          {outline && (
+            <path
+              d={outline}
+              fill="#efdfc2"
+              fillRule="evenodd"
+              stroke="#c3a778"
+              strokeWidth="3"
+              strokeDasharray="4 9"
+              strokeLinejoin="round"
+            />
+          )}
+          {!strokes.length && !live.length && mask.start && (
             <circle
               className="trace-start"
-              cx={guide[0].x}
-              cy={guide[0].y}
+              cx={mask.start.x}
+              cy={mask.start.y}
               r="10"
               fill="#e58a8a"
             />
@@ -171,7 +162,7 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
               points={pointsAttr(stroke)}
               fill="none"
               stroke="#e58a8a"
-              strokeWidth="14"
+              strokeWidth="16"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -181,7 +172,7 @@ export function TraceLetter({ letter, track, lang, onComplete }: Props) {
               points={pointsAttr(live)}
               fill="none"
               stroke="#db6f75"
-              strokeWidth="14"
+              strokeWidth="16"
               strokeLinecap="round"
               strokeLinejoin="round"
             />

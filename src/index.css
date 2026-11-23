@@ -1,3 +1,14 @@
+/* Шрифт арабских букв вшит в сборку, чтобы буквы выглядели одинаково на всех
+   устройствах и совпадали с контурами для упражнения «Обведи букву».
+   Шрифт: Noto Naskh Arabic, лицензия SIL OFL (public/fonts/OFL.txt). */
+@font-face {
+  font-family: 'Noto Naskh Arabic';
+  src: url('./assets/fonts/noto-naskh-arabic.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --cream: #fbf3e2;
   --cream-2: #f6e8cf;

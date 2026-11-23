@@ -1,20 +1,13 @@
 /**
  * Данные букв.
  *
- * `body` — осевая линия «тела» буквы в системе viewBox 0 0 320 320.
- * Путь начинается СПРАВА (так как арабский пишется справа налево):
- * ребёнок ведёт палец справа налево. По этому пути рисуется «дорожка»
- * для обводки и считается оценка.
+ * Здесь хранится только текстовое описание буквы (символ, имена, точки,
+ * слово-пример). Геометрия для упражнения «Обведи букву» лежит отдельно,
+ * в `letterShapes.ts`: это точные контуры букв, построенные из шрифта.
  *
- * `dots` — точки над/под телом. `family` — «семейство» похожих по форме
- * букв: их показываем вместе как отвлекатели (учим различать по точкам).
+ * `family` — «семейство» похожих по форме букв: их показываем вместе как
+ * отвлекатели (учим различать по точкам).
  */
-
-export interface Dot {
-  cx: number
-  cy: number
-  r: number
-}
 
 export interface Letter {
   id: string
@@ -31,9 +24,6 @@ export interface Letter {
   ttsSound: string
   dotCount: number
   dotSide: 'above' | 'below'
-  /** Осевая линия тела буквы (справа налево) */
-  body: string
-  dots: Dot[]
   /** Порядок в саду */
   order: number
   /** Семейство похожих букв */
@@ -45,28 +35,10 @@ export interface Letter {
   ttsWord: string
 }
 
-/**
- * «Лодочка» для ب ت ث: пологая чаша, левый конец выше (финаль),
- * правый короче. Старт трассировки — справа.
- */
-const BODY_BOAT =
-  'M 226 150 L 226 204 C 226 228 198 240 160 240 C 122 240 94 228 94 204 L 94 136'
-
-/** «Волна» для ج ح خ: открытая сверху чаша. */
-const BODY_WAVE =
-  'M 236 122 C 236 216 196 246 152 246 C 106 246 66 208 66 148 C 66 112 94 100 128 102 C 158 104 176 120 176 144'
-
-/** «Уголок» для د ذ: короткий диагональный штрих. */
-const BODY_DAAL = 'M 214 92 C 182 116 152 148 122 186'
-
-/** «Хвостик» для ر ز: штрих вниз с загибом влево. */
-const BODY_RAA =
-  'M 158 100 C 188 138 200 182 188 226 C 184 242 170 250 154 240'
-
 export const letters: Letter[] = [
   {
     id: 'alif', char: 'ا', nameAr: 'أَلِف', nameRu: 'алиф', soundRu: 'а', ttsName: 'ألف', ttsSound: 'أَ',
-    dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 0, family: 'alif',
+    dotCount: 0, dotSide: 'above', order: 0, family: 'alif',
     word: 'أَسَد', wordRu: 'лев', wordEmoji: '🏜️', ttsWord: 'أسد'
   },
   {
@@ -79,8 +51,6 @@ export const letters: Letter[] = [
     ttsSound: 'بَ',
     dotCount: 1,
     dotSide: 'below',
-    body: BODY_BOAT,
-    dots: [{ cx: 160, cy: 278, r: 13 }],
     order: 1,
     family: 'boat',
     word: 'بَاب',
@@ -98,11 +68,6 @@ export const letters: Letter[] = [
     ttsSound: 'تَ',
     dotCount: 2,
     dotSide: 'above',
-    body: BODY_BOAT,
-    dots: [
-      { cx: 140, cy: 108, r: 12 },
-      { cx: 180, cy: 108, r: 12 }
-    ],
     order: 2,
     family: 'boat',
     word: 'تَاج',
@@ -120,12 +85,6 @@ export const letters: Letter[] = [
     ttsSound: 'ثَ',
     dotCount: 3,
     dotSide: 'above',
-    body: BODY_BOAT,
-    dots: [
-      { cx: 160, cy: 92, r: 11 },
-      { cx: 136, cy: 118, r: 11 },
-      { cx: 184, cy: 118, r: 11 }
-    ],
     order: 3,
     family: 'boat',
     word: 'ثَلْج',
@@ -143,8 +102,6 @@ export const letters: Letter[] = [
     ttsSound: 'جَ',
     dotCount: 1,
     dotSide: 'below',
-    body: BODY_WAVE,
-    dots: [{ cx: 152, cy: 278, r: 13 }],
     order: 4,
     family: 'wave',
     word: 'جَمَل',
@@ -162,8 +119,6 @@ export const letters: Letter[] = [
     ttsSound: 'حَ',
     dotCount: 0,
     dotSide: 'below',
-    body: BODY_WAVE,
-    dots: [],
     order: 5,
     family: 'wave',
     word: 'حُصَان',
@@ -181,8 +136,6 @@ export const letters: Letter[] = [
     ttsSound: 'خَ',
     dotCount: 1,
     dotSide: 'above',
-    body: BODY_WAVE,
-    dots: [{ cx: 152, cy: 82, r: 12 }],
     order: 6,
     family: 'wave',
     word: 'خُبْز',
@@ -200,8 +153,6 @@ export const letters: Letter[] = [
     ttsSound: 'دَ',
     dotCount: 0,
     dotSide: 'below',
-    body: BODY_DAAL,
-    dots: [],
     order: 7,
     family: 'daal',
     word: 'دُبّ',
@@ -219,8 +170,6 @@ export const letters: Letter[] = [
     ttsSound: 'ذَ',
     dotCount: 1,
     dotSide: 'above',
-    body: BODY_DAAL,
-    dots: [{ cx: 150, cy: 58, r: 12 }],
     order: 8,
     family: 'daal',
     word: 'ذُرَة',
@@ -238,8 +187,6 @@ export const letters: Letter[] = [
     ttsSound: 'رَ',
     dotCount: 0,
     dotSide: 'below',
-    body: BODY_RAA,
-    dots: [],
     order: 9,
     family: 'raa',
     word: 'رُمَّان',
@@ -257,8 +204,6 @@ export const letters: Letter[] = [
     ttsSound: 'زَ',
     dotCount: 1,
     dotSide: 'above',
-    body: BODY_RAA,
-    dots: [{ cx: 168, cy: 64, r: 12 }],
     order: 10,
     family: 'raa',
     word: 'زَهْرَة',
@@ -268,88 +213,87 @@ export const letters: Letter[] = [
   },
   {
     id: 'seen', char: 'س', nameAr: 'سِين', nameRu: 'син', soundRu: 'са', ttsName: 'سين', ttsSound: 'سَ',
-    dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 11, family: 'seen',
+    dotCount: 0, dotSide: 'above', order: 11, family: 'seen',
     word: 'سَمَك', wordRu: 'рыба', wordEmoji: '🌊', ttsWord: 'سمك'
   },
   {
     id: 'sheen', char: 'ش', nameAr: 'شِين', nameRu: 'шин', soundRu: 'ша', ttsName: 'شين', ttsSound: 'شَ',
-    dotCount: 3, dotSide: 'above', body: BODY_WAVE,
-    dots: [{ cx: 128, cy: 78, r: 10 }, { cx: 160, cy: 62, r: 10 }, { cx: 192, cy: 78, r: 10 }], order: 12, family: 'seen',
+    dotCount: 3, dotSide: 'above', order: 12, family: 'seen',
     word: 'شَمْس', wordRu: 'солнце', wordEmoji: '☀️', ttsWord: 'شمس'
   },
   {
     id: 'saad', char: 'ص', nameAr: 'صَاد', nameRu: 'сад', soundRu: 'са', ttsName: 'صاد', ttsSound: 'صَ',
-    dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 13, family: 'saad',
+    dotCount: 0, dotSide: 'above', order: 13, family: 'saad',
     word: 'صَبْر', wordRu: 'терпение', wordEmoji: '🌿', ttsWord: 'صبر'
   },
   {
     id: 'daad', char: 'ض', nameAr: 'ضَاد', nameRu: 'дад', soundRu: 'да', ttsName: 'ضاد', ttsSound: 'ضَ',
-    dotCount: 1, dotSide: 'above', body: BODY_WAVE, dots: [{ cx: 156, cy: 74, r: 12 }], order: 14, family: 'saad',
+    dotCount: 1, dotSide: 'above', order: 14, family: 'saad',
     word: 'ضَوْء', wordRu: 'свет', wordEmoji: '💡', ttsWord: 'ضوء'
   },
   {
     id: 'taa', char: 'ط', nameAr: 'طَاء', nameRu: 'та', soundRu: 'та', ttsName: 'طاء', ttsSound: 'طَ',
-    dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 15, family: 'taa',
+    dotCount: 0, dotSide: 'above', order: 15, family: 'taa',
     word: 'طَرِيق', wordRu: 'дорога', wordEmoji: '🛤️', ttsWord: 'طريق'
   },
   {
     id: 'thaa', char: 'ظ', nameAr: 'ظَاء', nameRu: 'за', soundRu: 'за', ttsName: 'ظاء', ttsSound: 'ظَ',
-    dotCount: 1, dotSide: 'above', body: BODY_DAAL, dots: [{ cx: 150, cy: 58, r: 12 }], order: 16, family: 'taa',
+    dotCount: 1, dotSide: 'above', order: 16, family: 'taa',
     word: 'ظِلّ', wordRu: 'тень', wordEmoji: '⛱️', ttsWord: 'ظل'
   },
   {
     id: 'ain', char: 'ع', nameAr: 'عَيْن', nameRu: 'айн', soundRu: 'а', ttsName: 'عين', ttsSound: 'عَ',
-    dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 17, family: 'ain',
+    dotCount: 0, dotSide: 'above', order: 17, family: 'ain',
     word: 'عِلْم', wordRu: 'знание', wordEmoji: '📚', ttsWord: 'علم'
   },
   {
     id: 'ghain', char: 'غ', nameAr: 'غَيْن', nameRu: 'гайн', soundRu: 'га', ttsName: 'غين', ttsSound: 'غَ',
-    dotCount: 1, dotSide: 'above', body: BODY_WAVE, dots: [{ cx: 152, cy: 82, r: 12 }], order: 18, family: 'ain',
+    dotCount: 1, dotSide: 'above', order: 18, family: 'ain',
     word: 'غَيْم', wordRu: 'облако', wordEmoji: '☁️', ttsWord: 'غيم'
   },
   {
     id: 'faa', char: 'ف', nameAr: 'فَاء', nameRu: 'фа', soundRu: 'фа', ttsName: 'فاء', ttsSound: 'فَ',
-    dotCount: 1, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 160, cy: 94, r: 12 }], order: 19, family: 'faa',
+    dotCount: 1, dotSide: 'above', order: 19, family: 'faa',
     word: 'فَم', wordRu: 'рот', wordEmoji: '🔷', ttsWord: 'فم'
   },
   {
     id: 'qaaf', char: 'ق', nameAr: 'قَاف', nameRu: 'каф', soundRu: 'ка', ttsName: 'قاف', ttsSound: 'قَ',
-    dotCount: 2, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 142, cy: 88, r: 11 }, { cx: 178, cy: 88, r: 11 }], order: 20, family: 'faa',
+    dotCount: 2, dotSide: 'above', order: 20, family: 'faa',
     word: 'قَلَم', wordRu: 'ручка', wordEmoji: '🖊️', ttsWord: 'قلم'
   },
   {
     id: 'kaaf', char: 'ك', nameAr: 'كَاف', nameRu: 'каф', soundRu: 'ка', ttsName: 'كاف', ttsSound: 'كَ',
-    dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 21, family: 'kaaf',
+    dotCount: 0, dotSide: 'above', order: 21, family: 'kaaf',
     word: 'كِتَاب', wordRu: 'книга', wordEmoji: '📖', ttsWord: 'كتاب'
   },
   {
     id: 'laam', char: 'ل', nameAr: 'لَام', nameRu: 'лям', soundRu: 'ля', ttsName: 'لام', ttsSound: 'لَ',
-    dotCount: 0, dotSide: 'above', body: BODY_DAAL, dots: [], order: 22, family: 'laam',
+    dotCount: 0, dotSide: 'above', order: 22, family: 'laam',
     word: 'لَيْل', wordRu: 'ночь', wordEmoji: '☾', ttsWord: 'ليل'
   },
   {
     id: 'meem', char: 'م', nameAr: 'مِيم', nameRu: 'мим', soundRu: 'ма', ttsName: 'ميم', ttsSound: 'مَ',
-    dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 23, family: 'meem',
+    dotCount: 0, dotSide: 'above', order: 23, family: 'meem',
     word: 'مَاء', wordRu: 'вода', wordEmoji: '💧', ttsWord: 'ماء'
   },
   {
     id: 'noon', char: 'ن', nameAr: 'نُون', nameRu: 'нун', soundRu: 'на', ttsName: 'نون', ttsSound: 'نَ',
-    dotCount: 1, dotSide: 'above', body: BODY_BOAT, dots: [{ cx: 160, cy: 94, r: 12 }], order: 24, family: 'noon',
+    dotCount: 1, dotSide: 'above', order: 24, family: 'noon',
     word: 'نُور', wordRu: 'свет', wordEmoji: '🔆', ttsWord: 'نور'
   },
   {
     id: 'haa2', char: 'ه', nameAr: 'هَاء', nameRu: 'ха', soundRu: 'ха', ttsName: 'هاء', ttsSound: 'هَ',
-    dotCount: 0, dotSide: 'above', body: BODY_WAVE, dots: [], order: 25, family: 'haa2',
+    dotCount: 0, dotSide: 'above', order: 25, family: 'haa2',
     word: 'هِلَال', wordRu: 'полумесяц', wordEmoji: '☾', ttsWord: 'هلال'
   },
   {
     id: 'waw', char: 'و', nameAr: 'وَاو', nameRu: 'вау', soundRu: 'ва', ttsName: 'واو', ttsSound: 'وَ',
-    dotCount: 0, dotSide: 'above', body: BODY_RAA, dots: [], order: 26, family: 'waw',
+    dotCount: 0, dotSide: 'above', order: 26, family: 'waw',
     word: 'وَرَق', wordRu: 'лист', wordEmoji: '🍃', ttsWord: 'ورق'
   },
   {
     id: 'yaa', char: 'ي', nameAr: 'يَاء', nameRu: 'йа', soundRu: 'йа', ttsName: 'ياء', ttsSound: 'يَ',
-    dotCount: 2, dotSide: 'below', body: BODY_BOAT, dots: [{ cx: 142, cy: 278, r: 11 }, { cx: 178, cy: 278, r: 11 }], order: 27, family: 'yaa',
+    dotCount: 2, dotSide: 'below', order: 27, family: 'yaa',
     word: 'يَد', wordRu: 'рука', wordEmoji: '✋', ttsWord: 'يد'
   }
 ]
