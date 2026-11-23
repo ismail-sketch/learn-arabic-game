@@ -74,6 +74,13 @@ async function authUserByEmail(email: string): Promise<{ id: string } | null> {
   return data.users?.find(user => user.email?.toLowerCase() === email.toLowerCase()) ?? null
 }
 
+async function authUserEmails(): Promise<Set<string>> {
+  const result = await supabase(`/auth/v1/admin/users? page=1&per_page=1000`.replace('? ', '?'), { headers: { Accept: 'application/json' } })
+  if (!result.ok) return new Set()
+  const data = await result.json() as { users?: { id: string; email?: string }[] }
+  return new Set((data.users ?? []).map(user => user.email?.toLowerCase()).filter((email): email is string => Boolean(email)))
+}
+
 async function adminUserId(request: VercelRequest): Promise<string | null> {
   const admin = await requireAdmin(request)
   return admin?.userId ?? null
@@ -140,7 +147,9 @@ export default async function handler(request: VercelRequest, response: VercelRe
       if (!await requireAdmin(request)) { fail(response, 403, 'Admin access required'); return }
       const result = await supabase('/rest/v1/registration_requests?select=id,name,email,status,created_at,reviewed_at&order=created_at.desc')
       if (!result.ok) { fail(response, 502, 'Could not load registration requests'); return }
-      response.status(200).json(await result.json()); return
+      const rows = await result.json() as { id: string; name: string; email: string; status: string; created_at: string; reviewed_at: string | null }[]
+      const emails = await authUserEmails()
+      response.status(200).json(rows.map(item => ({ ...item, registered: emails.has(item.email.toLowerCase()) }))); return
     }
     if (body.action === 'approve' || body.action === 'reject') {
       const admin = await requireAdmin(request)

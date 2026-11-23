@@ -3,7 +3,7 @@ import { apiFetchOptions, apiUrl } from './api'
 export type AuthRole = 'parent' | 'admin'
 
 export interface AuthSession { authenticated: boolean; role?: AuthRole; familyId?: string }
-export interface RegistrationRequest { id: string; name: string; email: string; status: 'pending' | 'approved' | 'rejected'; created_at: string }
+export interface RegistrationRequest { id: string; name: string; email: string; status: 'pending' | 'approved' | 'rejected'; created_at: string; registered?: boolean }
 
 async function call(body: Record<string, string>): Promise<Response> {
   return fetch(apiUrl('/api/auth'), { ...apiFetchOptions, method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })

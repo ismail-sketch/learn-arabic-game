@@ -256,6 +256,18 @@ body {
   justify-content: flex-end;
 }
 
+.admin-request__registered {
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e7f2df;
+  color: #4f7c3f;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 /* ---------- Форма ---------- */
 
 .card {
